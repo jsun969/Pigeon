@@ -1,0 +1,12 @@
+{
+  "name": "pigoen",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "jsun969",
+  "license": "MIT",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.17.1",
+    "mongoose": "^5.11.19"
+  }
+}
