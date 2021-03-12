@@ -15,12 +15,13 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 const userRoutes = require("./routes/users.js");
-app.use("/users", userRoutes);
+app.use("/user", userRoutes);
 
 mongoose.connect(
   cfg.db.username === ""
     ? `mongodb://${cfg.db.host}:${cfg.db.port}/${cfg.db.name}`
-    : `mongodb://${cfg.db.username}:${cfg.db.password}@${cfg.db.host}:${cfg.db.port}/${cfg.db.name}`
+    : `mongodb://${cfg.db.username}:${cfg.db.password}@${cfg.db.host}:${cfg.db.port}/${cfg.db.name}`,
+  { useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false }
 );
 
 app.listen(port, () => {
