@@ -1,16 +1,16 @@
-const express = require("express");
-const crypto = require("crypto");
-const mongoose = require("mongoose");
+const express = require('express');
+const crypto = require('crypto');
 const router = express.Router();
 
-const InviteCode = require("../models/inviteCode");
-const User = require("../models/user");
-const { response } = require("../app");
+const InviteCode = require('../models/inviteCode');
+const User = require('../models/user');
 
-router.get("/invite_codes/:count", (req, res) => {
+// Generate registration codes
+// Use '?count=<Number>' provide quantity
+router.put('/invite-codes', (req, res) => {
   let randStrArr = [];
-  for (const i = 0; i < req.params.count; i++) {
-    const randStr = crypto.randomBytes(20).toString("hex");
+  for (let i = 0; i < req.query.count; i++) {
+    const randStr = crypto.randomBytes(20).toString('hex');
     const inviteCode = new InviteCode({
       code: randStr,
       username: null,
@@ -21,12 +21,13 @@ router.get("/invite_codes/:count", (req, res) => {
     });
     randStrArr.push(randStr);
   }
-  console.log(`Generated ${req.params.count} invite codes successfully!`);
+  console.log(`Generated ${req.query.count} invite codes successfully!`);
   console.log(randStrArr);
   res.status(200).json(randStrArr);
 });
 
-router.get("/invite_codes", (req, res) => {
+// Get all invite codes
+router.get('/invite-codes', (req, res) => {
   let docsArr = [];
   InviteCode.find()
     .then(docs => {
@@ -40,13 +41,14 @@ router.get("/invite_codes", (req, res) => {
     });
 });
 
-router.post("/register", (req, res) => {
+// Register
+router.post('/register', (req, res) => {
   InviteCode.findOneAndUpdate({ code: req.body.inviteCode }, { username: req.body.username })
     .then(doc => {
       if (doc) {
         const user = new User({
           username: req.body.username,
-          password: crypto.createHash("sha256").update(req.body.password).digest("hex"),
+          password: crypto.createHash('sha256').update(req.body.password).digest('hex'),
         });
         user
           .save()
@@ -59,8 +61,10 @@ router.post("/register", (req, res) => {
             res.status(500).json({ error: err });
           });
       } else {
-        console.log(`User [ ${req.body.username} ] tried to register, but the invite code is wrong.`);
-        res.status(500).json({ error: "Invite code not found" });
+        console.log(
+          `User [ ${req.body.username} ] tried to register, but the invite code is wrong.`
+        );
+        res.status(500).json({ error: 'Invite code not found' });
       }
     })
     .catch(err => {
@@ -69,15 +73,16 @@ router.post("/register", (req, res) => {
     });
 });
 
-router.get("/username/:username", (req, res) => {
-  User.find({ username: req.params.username })
+// Verify that the username is duplicated
+router.get('/username/:username', (req, res) => {
+  User.findOne({ username: req.params.username })
     .then(doc => {
-      if (doc.length !== 0) {
-        console.log(doc);
-        res.json({ haveUsername: true });
+      if (doc) {
+        console.log(`User [ ${req.params.username} ] has already registered.`);
+        res.json({ registered: true });
       } else {
         console.log(`User [ ${req.params.username} ] is not found.`);
-        res.status(404).json({ haveUsername: false });
+        res.status(404).json({ registered: false });
       }
     })
     .catch(err => {
@@ -86,8 +91,12 @@ router.get("/username/:username", (req, res) => {
     });
 });
 
-router.post("/login", (req, res) => {
-  User.find({ username: req.body.username, password: crypto.createHash("sha256").update(req.body.password).digest("hex") })
+// Login
+router.post('/login', (req, res) => {
+  User.findOne({
+    username: req.body.username,
+    password: crypto.createHash('sha256').update(req.body.password).digest('hex'),
+  })
     .then(doc => {
       if (doc.length !== 0) {
         console.log(`User [ ${req.body.username} ] login successfully.`);
