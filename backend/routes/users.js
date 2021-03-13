@@ -45,30 +45,27 @@ router.get('/invite-codes', (req, res) => {
 router.post('/register', (req, res) => {
   InviteCode.findOneAndUpdate({ code: req.body.inviteCode }, { username: req.body.username })
     .then(doc => {
-      console.log(doc);
-      if (doc) {
-        if (doc.username === null) {
-          const user = new User({
-            username: req.body.username,
-            password: crypto.createHash('sha256').update(req.body.password).digest('hex'),
-          });
-          user
-            .save()
-            .then(result => {
-              console.log(`User [ ${result.username} ] registered successfully!`);
-              res.json(result);
-            })
-            .catch(err => {
-              console.error(err);
-              res.status(500).json({ error: err });
-            });
-        } else {
-          console.log(`User [ ${req.body.username} ] tried to register, but the invite code has been used.`);
-          res.status(500).json({ error: 'Invite code error' });
-        }
-      } else {
+      if (!doc) {
         console.log(`User [ ${req.body.username} ] tried to register, but the invite code is wrong.`);
-        res.status(500).json({ error: 'Invite code not found' });
+        res.status(404).json({ error: 'Invite code not found' });
+      } else if (doc.username) {
+        console.log(`User [ ${req.body.username} ] tried to register, but the invite code has been used.`);
+        res.status(404).json({ error: 'Invite code error' });
+      } else {
+        const user = new User({
+          username: req.body.username,
+          password: crypto.createHash('sha256').update(req.body.password).digest('hex'),
+        });
+        user
+          .save()
+          .then(result => {
+            console.log(`User [ ${result.username} ] registered successfully!`);
+            res.sendStatus(200);
+          })
+          .catch(err => {
+            console.error(err);
+            res.status(500).json({ error: err });
+          });
       }
     })
     .catch(err => {
