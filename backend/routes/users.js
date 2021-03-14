@@ -21,7 +21,7 @@ router.put('/invite-codes', (req, res) => {
     });
     randStrArr.push(randStr);
   }
-  console.log(`Generated ${req.query.count} invite codes successfully!`);
+  console.log(`Generate ${req.query.count} invite codes successfully!`);
   console.log(randStrArr);
   res.status(200).json(randStrArr);
 });
@@ -46,10 +46,10 @@ router.post('/register', (req, res) => {
   InviteCode.findOneAndUpdate({ code: req.body.inviteCode }, { username: req.body.username })
     .then(doc => {
       if (!doc) {
-        console.log(`User [ ${req.body.username} ] tried to register, but the invite code is wrong.`);
+        console.log(`User [ ${req.body.username} ] try to register, but the invite code is wrong.`);
         res.status(404).json({ error: 'Invite code not found' });
       } else if (doc.username) {
-        console.log(`User [ ${req.body.username} ] tried to register, but the invite code has been used.`);
+        console.log(`User [ ${req.body.username} ] try to register, but the invite code has been used.`);
         res.status(404).json({ error: 'Invite code error' });
       } else {
         const user = new User({
@@ -59,7 +59,7 @@ router.post('/register', (req, res) => {
         user
           .save()
           .then(result => {
-            console.log(`User [ ${result.username} ] registered successfully!`);
+            console.log(`User [ ${result.username} ] register successfully!`);
             res.sendStatus(200);
           })
           .catch(err => {
