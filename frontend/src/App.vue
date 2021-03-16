@@ -20,7 +20,7 @@ export default {
     Main,
   },
   data: () => ({
-    isLogin: false,
+    isLogin: true,
   }),
 };
 </script>
