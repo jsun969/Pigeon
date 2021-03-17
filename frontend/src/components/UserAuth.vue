@@ -12,11 +12,17 @@
           <v-btn color="primary" elevation="2" large>登录</v-btn>
         </v-tab-item>
         <v-tab-item>
-          <v-text-field v-model="registerName" label="用户名" :rules="nameRules"></v-text-field>
-          <v-text-field v-model="registerPwd1" label="密码" type="password" :rules="pwdRules"></v-text-field>
-          <v-text-field v-model="registerPwd2" label="重复密码" type="password" :rules="rePwdRule"></v-text-field>
+          <v-text-field v-model="registerName" label="用户名" :rules="nameRules" @update:error="isRegNameErr = $event"></v-text-field>
+          <v-text-field v-model="registerPwd1" label="密码" type="password" :rules="pwdRules" @update:error="isRegPwd1Err = $event"></v-text-field>
+          <v-text-field
+            v-model="registerPwd2"
+            label="重复密码"
+            type="password"
+            :rules="rePwdRule"
+            @update:error="isRegPwd2Err = $event"
+          ></v-text-field>
           <v-text-field v-model="inviteCode" label="邀请码"></v-text-field>
-          <v-btn color="primary" elevation="2" large @click="logpwd2">注册</v-btn>
+          <v-btn color="primary" elevation="2" large @click="logpwd2" :disabled="isRegBtnDisabled">注册</v-btn>
         </v-tab-item>
       </v-tabs-items>
     </v-card>
@@ -31,8 +37,12 @@ export default {
     loginName: '',
     loginPwd: '',
     registerName: '',
+    isRegNameErr: false,
     registerPwd1: '',
+    isRegPwd1Err: false,
     registerPwd2: '',
+    isRegPwd2Err: false,
+    inviteCode: '',
     nameRules: [
       value => (value || '').length <= 20 || !value || '最多20个字符',
       value => (value || '').length >= 4 || !value || '至少4个字符',
@@ -46,7 +56,7 @@ export default {
       value => (value || '').length >= 10 || !value || '至少10个字符',
       value => {
         const pattern = /^.*(?=.{6,})(?=.*\d)(?=.*[A-Z])(?=.*[a-z]).*$/;
-        return pattern.test(value) || !value || '密码无效';
+        return pattern.test(value) || !value || '密码无效 , 大小写字母+数字';
       },
     ],
   }),
@@ -58,6 +68,11 @@ export default {
   computed: {
     rePwdRule() {
       return [this.registerPwd1 === this.registerPwd2 || '重复密码不正确'];
+    },
+    isRegBtnDisabled() {
+      const isEmpty = !this.registerName || !this.registerPwd1 || !this.registerPwd2 || !this.inviteCode;
+      const haveError = this.isRegNameErr || this.isRegPwd1Err || this.isRegPwd2Err;
+      return isEmpty || haveError;
     },
   },
 };
