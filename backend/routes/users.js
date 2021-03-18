@@ -23,7 +23,7 @@ router.put('/invite-codes', (req, res) => {
   }
   console.log(`Generate ${req.query.count} invite codes successfully!`);
   console.log(randStrArr);
-  res.status(200).json(randStrArr);
+  res.json(randStrArr);
 });
 
 // Get all invite codes
@@ -43,47 +43,41 @@ router.get('/invite-codes', (req, res) => {
 
 // Register
 router.post('/register', (req, res) => {
-  InviteCode.findOneAndUpdate({ code: req.body.inviteCode }, { username: req.body.username })
+  User.findOne({ username: req.body.username })
     .then(doc => {
       if (!doc) {
-        console.log(`User [ ${req.body.username} ] try to register, but the invite code is wrong.`);
-        res.status(404).json({ error: 'Invite code not found' });
-      } else if (doc.username) {
-        console.log(`User [ ${req.body.username} ] try to register, but the invite code has been used.`);
-        res.status(404).json({ error: 'Invite code error' });
-      } else {
-        const user = new User({
-          username: req.body.username,
-          password: crypto.createHash('sha256').update(req.body.password).digest('hex'),
-        });
-        user
-          .save()
-          .then(result => {
-            console.log(`User [ ${result.username} ] register successfully!`);
-            res.sendStatus(200);
+        InviteCode.findOneAndUpdate({ code: req.body.inviteCode }, { username: req.body.username })
+          .then(doc => {
+            if (!doc) {
+              console.log(`User [ ${req.body.username} ] try to register, but the invite code is wrong.`);
+              res.status(404).json({ error: 'InviteCodeNotFound' });
+            } else if (doc.username) {
+              console.log(`User [ ${req.body.username} ] try to register, but the invite code has been used.`);
+              res.status(404).json({ error: 'InviteCodeError' });
+            } else {
+              const user = new User({
+                username: req.body.username,
+                password: crypto.createHash('sha256').update(req.body.password).digest('hex'),
+              });
+              user
+                .save()
+                .then(result => {
+                  console.log(`User [ ${result.username} ] register successfully!`);
+                  res.sendStatus(200);
+                })
+                .catch(err => {
+                  console.error(err);
+                  res.status(500).json({ error: err });
+                });
+            }
           })
           .catch(err => {
             console.error(err);
             res.status(500).json({ error: err });
           });
-      }
-    })
-    .catch(err => {
-      console.error(err);
-      res.status(500).json({ error: err });
-    });
-});
-
-// Verify that the username is duplicated
-router.get('/username/:username', (req, res) => {
-  User.findOne({ username: req.params.username })
-    .then(doc => {
-      if (doc) {
-        console.log(`User [ ${req.params.username} ] has already registered.`);
-        res.json({ registered: true });
       } else {
-        console.log(`User [ ${req.params.username} ] is not found.`);
-        res.status(404).json({ registered: false });
+        console.log(`User [ ${req.body.username} ] has already registered.`);
+        res.status(404).json({ error: 'DuplicateUsername' });
       }
     })
     .catch(err => {
@@ -104,7 +98,7 @@ router.post('/login', (req, res) => {
         res.sendStatus(200);
       } else {
         console.log(`User [ ${req.body.username} ] login error.`);
-        res.sendStatus(404);
+        res.status(404).json({ err: 'LoginError' });
       }
     })
     .catch(err => {
