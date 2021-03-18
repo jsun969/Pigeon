@@ -9,7 +9,7 @@
         <v-tab-item>
           <v-text-field v-model="loginName" label="用户名"></v-text-field>
           <v-text-field v-model="loginPwd" label="密码" type="password"></v-text-field>
-          <v-btn color="primary" elevation="2" large>登录</v-btn>
+          <v-btn color="primary" elevation="2" large :disabled="isLoginBtnDisabled">登录</v-btn>
         </v-tab-item>
         <v-tab-item>
           <v-text-field v-model="registerName" label="用户名" :rules="nameRules" @update:error="isRegNameErr = $event"></v-text-field>
@@ -33,7 +33,7 @@
 export default {
   name: 'UserAuth',
   data: () => ({
-    tab: 1,
+    tab: null,
     loginName: '',
     loginPwd: '',
     registerName: '',
@@ -73,6 +73,9 @@ export default {
       const isEmpty = !this.registerName || !this.registerPwd1 || !this.registerPwd2 || !this.inviteCode;
       const haveError = this.isRegNameErr || this.isRegPwd1Err || this.isRegPwd2Err;
       return isEmpty || haveError;
+    },
+    isLoginBtnDisabled() {
+      return !this.loginName || !this.loginPwd;
     },
   },
 };
