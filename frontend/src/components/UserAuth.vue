@@ -22,7 +22,7 @@
             @update:error="isRegPwd2Err = $event"
           ></v-text-field>
           <v-text-field v-model="inviteCode" label="邀请码"></v-text-field>
-          <v-btn color="primary" elevation="2" large @click="logpwd2" :disabled="isRegBtnDisabled">注册</v-btn>
+          <v-btn color="primary" elevation="2" large @click="register" :disabled="isRegBtnDisabled">注册</v-btn>
         </v-tab-item>
       </v-tabs-items>
     </v-card>
@@ -30,6 +30,10 @@
 </template>
 
 <script>
+import axios from 'axios';
+
+const URL = 'http://localhost:3000';
+
 export default {
   name: 'UserAuth',
   data: () => ({
@@ -61,8 +65,20 @@ export default {
     ],
   }),
   methods: {
-    logpwd2() {
-      console.log(this.pwd2Rules);
+    register() {
+      const userData = {
+        username: this.registerName,
+        password: this.registerPwd1,
+        inviteCode: this.inviteCode,
+      };
+      axios
+        .post(`${URL}/user/register`, userData)
+        .then(res => {
+          if ((res.status === 200)) {
+            this.$emit('register-success');
+          }
+        })
+        .catch();
     },
   },
   computed: {
@@ -88,7 +104,8 @@ export default {
   align-items: center;
   .v-card {
     height: 400px;
-    width: 400px;
+    width: 360px;
+    margin: 0px 20px;
     .v-window-item {
       padding: 40px;
       height: 320px;

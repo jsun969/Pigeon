@@ -6,11 +6,13 @@ const mongoose = require("mongoose");
 const app = express();
 const port = cfg.app.port;
 
-const whitelist = cfg.app.origin;
-const corsOptions = {
-  origin: (origin, callback) => (whitelist.indexOf(origin) !== -1 ? callback(null, true) : callback(new Error("Not allowed by CORS"))),
-};
+// const whitelist = cfg.app.origin;
+// const corsOptions = {
+//   origin: (origin, callback) => (whitelist.indexOf(origin) !== -1 ? callback(null, true) : callback(new Error("Not allowed by CORS"))),
+// };
 // app.use(cors(corsOptions));
+app.use(cors());
+
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 

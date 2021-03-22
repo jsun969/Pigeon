@@ -1,7 +1,7 @@
 const cfg = {
   app: {
     port: 3000,
-    origin: ["http://localhost"],
+    origin: ["http://localhost:8080"],
   },
   db: {
     username: "",
