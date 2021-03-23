@@ -5,7 +5,7 @@
       <UserAuth v-if="isLogin" @register-success="regSuccess" />
       <Main v-else />
     </v-main>
-    <Dialog :showDialog="true" />
+    <Dialog :showDialog="dialogOpen" :titleText="dialogTitle" :mainText="dialogText" :titleStyle="dialogStyle" @close="dialogOpen = false" />
   </v-app>
 </template>
 
@@ -24,7 +24,10 @@ export default {
   },
   data: () => ({
     isLogin: true,
-    dialog: false,
+    dialogOpen: true,
+    dialogTitle: 'lol',
+    dialogText: 'olo',
+    dialogStyle: true,
   }),
   methods: {
     regSuccess() {

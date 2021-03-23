@@ -1,15 +1,15 @@
 <template>
-  <v-dialog v-model="showDialog" width="500">
+  <v-dialog v-model="showDialog" width="300">
     <v-card>
-      <v-card-title class="headline grey lighten-2">{{ titleText }}</v-card-title>
+      <v-card-title :class="{ headline: true, success: titleStyle, error: !titleStyle }" style="color: white">{{ titleText }}</v-card-title>
 
-      <v-card-text>{{ mainText }}</v-card-text>
+      <v-card-text style="padding: 24px 20px;">{{ mainText }}</v-card-text>
 
       <v-divider></v-divider>
 
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn color="primary" text @click="showDialog = false">
+        <v-btn color="primary" text @click="$emit('close')">
           确定
         </v-btn>
       </v-card-actions>
