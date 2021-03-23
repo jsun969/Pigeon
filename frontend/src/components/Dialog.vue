@@ -1,7 +1,9 @@
 <template>
   <v-dialog v-model="showDialog" width="300">
     <v-card>
-      <v-card-title :class="{ headline: true, success: titleStyle, error: !titleStyle }" style="color: white">{{ titleText }}</v-card-title>
+      <v-card-title :class="{ headline: true, success: titleStyle, error: !titleStyle }" style="color: white">
+        {{ titleStyle ? '成功' : '失败' }}
+      </v-card-title>
 
       <v-card-text style="padding: 24px 20px;">{{ mainText }}</v-card-text>
 

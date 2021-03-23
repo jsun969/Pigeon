@@ -53,7 +53,7 @@ router.post('/register', (req, res) => {
               res.status(404).json({ error: 'InviteCodeNotFound' });
             } else if (doc.username) {
               console.log(`User [ ${req.body.username} ] try to register, but the invite code has been used.`);
-              res.status(404).json({ error: 'InviteCodeError' });
+              res.status(404).json({ error: 'InviteCodeIsUsed' });
             } else {
               const user = new User({
                 username: req.body.username,

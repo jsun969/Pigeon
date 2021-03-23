@@ -37,7 +37,7 @@ const URL = 'http://localhost:3000';
 export default {
   name: 'UserAuth',
   data: () => ({
-    tab: null,
+    tab: 1,
     loginName: '',
     loginPwd: '',
     registerName: '',
@@ -74,11 +74,17 @@ export default {
       axios
         .post(`${URL}/user/register`, userData)
         .then(res => {
-          if ((res.status === 200)) {
+          if (res.status === 200) {
             this.$emit('register-success');
           }
         })
-        .catch();
+        .catch(res => {
+          if (res.status === 404) {
+            this.$emit('register-error', res.data.error);
+          } else if (res.status === 500) {
+            this.$emit('server-error', res.data.error);
+          }
+        });
     },
   },
   computed: {
