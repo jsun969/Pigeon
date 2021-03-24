@@ -65,26 +65,26 @@ export default {
     ],
   }),
   methods: {
-    register() {
-      const userData = {
-        username: this.registerName,
-        password: this.registerPwd1,
-        inviteCode: this.inviteCode,
-      };
-      axios
-        .post(`${URL}/user/register`, userData)
-        .then(res => {
-          if (res.status === 200) {
-            this.$emit('register-success');
-          }
-        })
-        .catch(res => {
-          if (res.status === 404) {
-            this.$emit('register-error', res.data.error);
-          } else if (res.status === 500) {
-            this.$emit('server-error', res.data.error);
-          }
-        });
+    async register() {
+      try {
+        const { registerName: username, registerPwd1: password, inviteCode } = this;
+        const userData = { username, password, inviteCode };
+        const { status } = await axios.post(`${URL}/user/register`, userData);
+        if (status === 200) {
+          this.$emit('register-success');
+        }
+      } catch ({
+        response: {
+          status,
+          data: { error },
+        },
+      }) {
+        if (status === 404) {
+          this.$emit('register-error', error);
+        } else if (status === 500) {
+          this.$emit('server-error', error);
+        }
+      }
     },
   },
   computed: {
