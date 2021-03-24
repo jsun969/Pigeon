@@ -93,12 +93,12 @@ router.post('/login', (req, res) => {
     password: crypto.createHash('sha256').update(req.body.password).digest('hex'),
   })
     .then(doc => {
-      if (doc.length !== 0) {
+      if (doc !== null) {
         console.log(`User [ ${req.body.username} ] login successfully.`);
         res.sendStatus(200);
       } else {
         console.log(`User [ ${req.body.username} ] login error.`);
-        res.status(404).json({ err: 'LoginError' });
+        res.status(404).json({ error: 'LoginError' });
       }
     })
     .catch(err => {
