@@ -2,7 +2,14 @@
   <v-app>
     <v-app-bar app color="primary" dark>飞鸽传书</v-app-bar>
     <v-main>
-      <UserAuth v-if="isLogin" @register-success="regSuccess" @register-error="regError" @server-error="serverError" />
+      <UserAuth
+        v-if="isLogin"
+        @register-success="regSuccess"
+        @register-error="regError"
+        @server-error="serverError"
+        @login-success="loginSuccess"
+        @login-error="loginError"
+      />
       <Main v-else />
     </v-main>
     <Dialog :showDialog="dialogOpen" :mainText="dialogText" :titleStyle="dialogStyle" @close="dialogOpen = false" />
@@ -46,6 +53,16 @@ export default {
       this.dialogOpen = true;
       this.dialogStyle = false;
       this.dialogText = `服务器错误 , ${msg}`;
+    },
+    loginSuccess() {
+      this.dialogOpen = true;
+      this.dialogStyle = true;
+      this.dialogText = '登陆成功';
+    },
+    loginError() {
+      this.dialogOpen = true;
+      this.dialogStyle = false;
+      this.dialogText = '登陆失败 , 请检查用户名和密码';
     },
   },
 };

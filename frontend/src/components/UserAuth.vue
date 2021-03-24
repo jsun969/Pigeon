@@ -9,7 +9,7 @@
         <v-tab-item>
           <v-text-field v-model="loginName" label="用户名"></v-text-field>
           <v-text-field v-model="loginPwd" label="密码" type="password"></v-text-field>
-          <v-btn color="primary" elevation="2" large :disabled="isLoginBtnDisabled">登录</v-btn>
+          <v-btn color="primary" elevation="2" large :disabled="isLoginBtnDisabled" @click="login">登录</v-btn>
         </v-tab-item>
         <v-tab-item>
           <v-text-field v-model="registerName" label="用户名" :rules="nameRules" @update:error="isRegNameErr = $event"></v-text-field>
@@ -37,7 +37,7 @@ const URL = 'http://localhost:3000';
 export default {
   name: 'UserAuth',
   data: () => ({
-    tab: 1,
+    tab: 0,
     loginName: '',
     loginPwd: '',
     registerName: '',
@@ -69,7 +69,7 @@ export default {
       try {
         const { registerName: username, registerPwd1: password, inviteCode } = this;
         const userData = { username, password, inviteCode };
-        const { status } = await axios.post(`${URL}/user/register`, userData);
+        const { status } = (await axios.post(`${URL}/user/register`, userData)) || {};
         if (status === 200) {
           this.$emit('register-success');
         }
@@ -86,10 +86,31 @@ export default {
         }
       }
     },
+    async login() {
+      try {
+        const { loginName: username, loginPwd: password } = this;
+        const userData = { username, password };
+        const { status } = (await axios.post(`${URL}/user/login`, userData)) || {};
+        if (status === 200) {
+          this.$emit('login-success');
+        }
+      } catch ({
+        response: {
+          status,
+          data: { error },
+        },
+      }) {
+        if (status === 404) {
+          this.$emit('login-error');
+        } else if (status === 500) {
+          this.$emit('server-error', error);
+        }
+      }
+    },
   },
   computed: {
     rePwdRule() {
-      return [this.registerPwd1 === this.registerPwd2 || '重复密码不正确'];
+      return [(this.registerPwd1 === this.registerPwd2 && !this.isRegPwd1Err) || !this.registerPwd2 || '重复密码不正确'];
     },
     isRegBtnDisabled() {
       const isEmpty = !this.registerName || !this.registerPwd1 || !this.registerPwd2 || !this.inviteCode;
