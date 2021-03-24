@@ -7,21 +7,35 @@
       </v-tabs>
       <v-tabs-items v-model="tab">
         <v-tab-item>
-          <v-text-field v-model="loginName" label="用户名"></v-text-field>
-          <v-text-field v-model="loginPwd" label="密码" type="password"></v-text-field>
+          <v-text-field v-model="loginName" label="用户名" @keyup.enter="login"></v-text-field>
+          <v-text-field v-model="loginPwd" label="密码" type="password" @keyup.enter="login"></v-text-field>
           <v-btn color="primary" elevation="2" large :disabled="isLoginBtnDisabled" @click="login">登录</v-btn>
         </v-tab-item>
         <v-tab-item>
-          <v-text-field v-model="registerName" label="用户名" :rules="nameRules" @update:error="isRegNameErr = $event"></v-text-field>
-          <v-text-field v-model="registerPwd1" label="密码" type="password" :rules="pwdRules" @update:error="isRegPwd1Err = $event"></v-text-field>
+          <v-text-field
+            v-model="registerName"
+            label="用户名"
+            :rules="nameRules"
+            @update:error="isRegNameErr = $event"
+            @keyup.enter="register"
+          ></v-text-field>
+          <v-text-field
+            v-model="registerPwd1"
+            label="密码"
+            type="password"
+            :rules="pwdRules"
+            @update:error="isRegPwd1Err = $event"
+            @keyup.enter="register"
+          ></v-text-field>
           <v-text-field
             v-model="registerPwd2"
             label="重复密码"
             type="password"
             :rules="rePwdRule"
             @update:error="isRegPwd2Err = $event"
+            @keyup.enter="register"
           ></v-text-field>
-          <v-text-field v-model="inviteCode" label="邀请码"></v-text-field>
+          <v-text-field v-model="registerInviteCode" label="邀请码" @keyup.enter="register"></v-text-field>
           <v-btn color="primary" elevation="2" large @click="register" :disabled="isRegBtnDisabled">注册</v-btn>
         </v-tab-item>
       </v-tabs-items>
@@ -37,7 +51,7 @@ const URL = 'http://localhost:3000';
 export default {
   name: 'UserAuth',
   data: () => ({
-    tab: 0,
+    tab: 1,
     loginName: '',
     loginPwd: '',
     registerName: '',
@@ -46,7 +60,7 @@ export default {
     isRegPwd1Err: false,
     registerPwd2: '',
     isRegPwd2Err: false,
-    inviteCode: '',
+    registerInviteCode: '',
     nameRules: [
       value => (value || '').length <= 20 || !value || '最多20个字符',
       value => (value || '').length >= 4 || !value || '至少4个字符',
@@ -66,8 +80,9 @@ export default {
   }),
   methods: {
     async register() {
+      if (this.isRegBtnDisabled) return;
       try {
-        const { registerName: username, registerPwd1: password, inviteCode } = this;
+        const { registerName: username, registerPwd1: password, registerInviteCode: inviteCode } = this;
         const userData = { username, password, inviteCode };
         const { status } = (await axios.post(`${URL}/user/register`, userData)) || {};
         if (status === 200) {
@@ -85,8 +100,13 @@ export default {
           this.$emit('server-error', error);
         }
       }
+      this.registerName = '';
+      this.registerPwd1 = '';
+      this.registerPwd2 = '';
+      this.registerInviteCode = '';
     },
     async login() {
+      if (this.isLoginBtnDisabled) return;
       try {
         const { loginName: username, loginPwd: password } = this;
         const userData = { username, password };
@@ -106,6 +126,8 @@ export default {
           this.$emit('server-error', error);
         }
       }
+      this.loginName = '';
+      this.loginPwd = '';
     },
   },
   computed: {
@@ -113,7 +135,7 @@ export default {
       return [(this.registerPwd1 === this.registerPwd2 && !this.isRegPwd1Err) || !this.registerPwd2 || '重复密码不正确'];
     },
     isRegBtnDisabled() {
-      const isEmpty = !this.registerName || !this.registerPwd1 || !this.registerPwd2 || !this.inviteCode;
+      const isEmpty = !this.registerName || !this.registerPwd1 || !this.registerPwd2 || !this.registerInviteCode;
       const haveError = this.isRegNameErr || this.isRegPwd1Err || this.isRegPwd2Err;
       return isEmpty || haveError;
     },
