@@ -1,5 +1,9 @@
+const cfg = require('../config.js');
+
 const express = require('express');
+const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
+
 const router = express.Router();
 
 const InviteCode = require('../models/inviteCode');
@@ -15,9 +19,9 @@ router.put('/invite-codes', (req, res) => {
       code: randStr,
       username: null,
     });
-    inviteCode.save().catch(err => {
-      console.error(err);
-      res.status(500).json({ error: err });
+    inviteCode.save().catch(error => {
+      console.error(error);
+      res.status(500).send({ error });
     });
     randStrArr.push(randStr);
   }
@@ -27,18 +31,16 @@ router.put('/invite-codes', (req, res) => {
 });
 
 // Get all invite codes
-router.get('/invite-codes', (req, res) => {
-  let docsArr = [];
-  InviteCode.find()
-    .then(docs => {
-      docsArr = docs.map(({ code, username }) => ({ code, username }));
-      console.log(docsArr);
-      res.json(docsArr);
-    })
-    .catch(err => {
-      console.error(err);
-      res.status(500).json({ error: err });
-    });
+router.get('/invite-codes', async (req, res) => {
+  try {
+    const docs = await InviteCode.find();
+    const docsArr = docs.map(({ code, username }) => ({ code, username }));
+    console.log('Get all invite codes successfully!');
+    res.json(docsArr);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send({ error });
+  }
 });
 
 // Register
@@ -65,46 +67,59 @@ router.post('/register', (req, res) => {
                   console.log(`User [ ${result.username} ] register successfully!`);
                   res.sendStatus(200);
                 })
-                .catch(err => {
-                  console.error(err);
-                  res.status(500).json({ error: err });
+                .catch(error => {
+                  console.error(error);
+                  res.status(500).send({ error });
                 });
             }
           })
-          .catch(err => {
-            console.error(err);
-            res.status(500).json({ error: err });
+          .catch(error => {
+            console.error(error);
+            res.status(500).send({ error });
           });
       } else {
         console.log(`User [ ${req.body.username} ] has already registered.`);
         res.status(404).json({ error: 'DuplicateUsername' });
       }
     })
-    .catch(err => {
-      console.error(err);
-      res.status(500).json({ error: err });
+    .catch(error => {
+      console.error(error);
+      res.status(500).send({ error });
     });
 });
 
 // Login
-router.post('/login', (req, res) => {
-  User.findOne({
-    username: req.body.username,
-    password: crypto.createHash('sha256').update(req.body.password).digest('hex'),
-  })
-    .then(doc => {
-      if (doc !== null) {
-        console.log(`User [ ${req.body.username} ] login successfully.`);
-        res.sendStatus(200);
-      } else {
-        console.log(`User [ ${req.body.username} ] login error.`);
-        res.status(404).json({ error: 'LoginError' });
-      }
-    })
-    .catch(err => {
-      console.error(err);
-      res.status(500).json({ error: err });
+router.post('/login', async (req, res) => {
+  try {
+    const doc = await User.findOne({
+      username: req.body.username,
+      password: crypto.createHash('sha256').update(req.body.password).digest('hex'),
     });
+    if (doc !== null) {
+      console.log(`User [ ${req.body.username} ] login successfully.`);
+      const token = jwt.sign({ userId: doc._id }, cfg.token.secret, { expiresIn: cfg.token.maxAge });
+      res.json({ token });
+    } else {
+      console.log(`User [ ${req.body.username} ] login error.`);
+      res.status(404).json({ error: 'LoginError' });
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).send({ error });
+  }
+});
+
+// Verify token of logged user
+router.post('/token-verify', async (req, res) => {
+  try {
+    const decoded = jwt.verify(req.body.auth, cfg.token.secret);
+    const { username } = await User.findById(decoded.userId);
+    console.log(`User [ ${username} ] login with token successfully.`);
+    res.json({ username });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send({ error });
+  }
 });
 
 module.exports = router;
