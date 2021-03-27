@@ -11,23 +11,25 @@ const User = require('../models/user');
 
 // Generate invite codes
 // Use '?count=<Number>' to provide quantity
-router.put('/invite-codes', (req, res) => {
-  let randStrArr = [];
-  for (let i = 0; i < req.query.count; i++) {
-    const randStr = crypto.randomBytes(20).toString('hex');
-    const inviteCode = new InviteCode({
-      code: randStr,
-      username: null,
-    });
-    inviteCode.save().catch(error => {
-      console.error(error);
-      res.status(500).send({ error });
-    });
-    randStrArr.push(randStr);
+router.put('/invite-codes', async (req, res) => {
+  try {
+    let randStrArr = [];
+    for (let i = 0; i < req.query.count; i++) {
+      const randStr = crypto.randomBytes(20).toString('hex');
+      const inviteCode = new InviteCode({
+        code: randStr,
+        username: null,
+      });
+      await inviteCode.save();
+      randStrArr.push(randStr);
+    }
+    console.log(`Generate ${req.query.count} invite codes successfully!`);
+    console.log(randStrArr);
+    res.json(randStrArr);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send({ error });
   }
-  console.log(`Generate ${req.query.count} invite codes successfully!`);
-  console.log(randStrArr);
-  res.json(randStrArr);
 });
 
 // Get all invite codes
@@ -44,48 +46,34 @@ router.get('/invite-codes', async (req, res) => {
 });
 
 // Register
-router.post('/register', (req, res) => {
-  User.findOne({ username: req.body.username })
-    .then(doc => {
-      if (!doc) {
-        InviteCode.findOneAndUpdate({ code: req.body.inviteCode }, { username: req.body.username })
-          .then(doc => {
-            if (!doc) {
-              console.log(`User [ ${req.body.username} ] try to register, but the invite code is wrong.`);
-              res.status(404).json({ error: 'InviteCodeNotFound' });
-            } else if (doc.username) {
-              console.log(`User [ ${req.body.username} ] try to register, but the invite code has been used.`);
-              res.status(404).json({ error: 'InviteCodeIsUsed' });
-            } else {
-              const user = new User({
-                username: req.body.username,
-                password: crypto.createHash('sha256').update(req.body.password).digest('hex'),
-              });
-              user
-                .save()
-                .then(result => {
-                  console.log(`User [ ${result.username} ] register successfully!`);
-                  res.sendStatus(200);
-                })
-                .catch(error => {
-                  console.error(error);
-                  res.status(500).send({ error });
-                });
-            }
-          })
-          .catch(error => {
-            console.error(error);
-            res.status(500).send({ error });
-          });
+router.post('/register', async (req, res) => {
+  try {
+    const doc = await User.findOne({ username: req.body.username });
+    if (!doc) {
+      const codeDoc = await InviteCode.findOneAndUpdate({ code: req.body.inviteCode }, { username: req.body.username });
+      if (!codeDoc) {
+        console.log(`User [ ${req.body.username} ] try to register, but the invite code is wrong.`);
+        res.status(404).json({ error: 'InviteCodeNotFound' });
+      } else if (codeDoc.username) {
+        console.log(`User [ ${req.body.username} ] try to register, but the invite code has been used.`);
+        res.status(404).json({ error: 'InviteCodeIsUsed' });
       } else {
-        console.log(`User [ ${req.body.username} ] has already registered.`);
-        res.status(404).json({ error: 'DuplicateUsername' });
+        const user = new User({
+          username: req.body.username,
+          password: crypto.createHash('sha256').update(req.body.password).digest('hex'),
+        });
+        userRes = await user.save();
+        console.log(`User [ ${userRes.username} ] register successfully!`);
+        res.sendStatus(200);
       }
-    })
-    .catch(error => {
-      console.error(error);
-      res.status(500).send({ error });
-    });
+    } else {
+      console.log(`User [ ${req.body.username} ] has already registered.`);
+      res.status(404).json({ error: 'DuplicateUsername' });
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).send({ error });
+  }
 });
 
 // Login
