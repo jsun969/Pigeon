@@ -46,12 +46,10 @@
 <script>
 import axios from 'axios';
 
-const URL = 'http://localhost:3000';
-
 export default {
   name: 'UserAuth',
   data: () => ({
-    tab: 1,
+    tab: 0,
     loginName: '',
     loginPwd: '',
     registerName: '',
@@ -84,7 +82,7 @@ export default {
       try {
         const { registerName: username, registerPwd1: password, registerInviteCode: inviteCode } = this;
         const userData = { username, password, inviteCode };
-        const { status } = (await axios.post(`${URL}/user/register`, userData)) || {};
+        const { status } = (await axios.post(`${this.$store.state.reqUrl}/user/register`, userData)) || {};
         if (status === 200) {
           this.$emit('register-success');
         }
@@ -97,7 +95,7 @@ export default {
         if (status === 404) {
           this.$emit('register-error', error);
         } else if (status === 500) {
-          this.$emit('server-error', error);
+          this.$emit('server-error', error.code);
         }
       }
       this.registerName = '';
@@ -110,9 +108,10 @@ export default {
       try {
         const { loginName: username, loginPwd: password } = this;
         const userData = { username, password };
-        const { status } = (await axios.post(`${URL}/user/login`, userData)) || {};
+        const { status, data } = (await axios.post(`${this.$store.state.reqUrl}/user/login`, userData)) || {};
         if (status === 200) {
-          this.$emit('login-success');
+          this.$emit('login-success', username);
+          localStorage.setItem('userToken', data.token);
         }
       } catch ({
         response: {
@@ -123,7 +122,7 @@ export default {
         if (status === 404) {
           this.$emit('login-error');
         } else if (status === 500) {
-          this.$emit('server-error', error);
+          this.$emit('server-error', error.code);
         }
       }
       this.loginName = '';

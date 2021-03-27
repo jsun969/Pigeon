@@ -3,7 +3,7 @@
     <v-app-bar app color="primary" dark>飞鸽传书</v-app-bar>
     <v-main>
       <UserAuth
-        v-if="isLogin"
+        v-if="!isLogin"
         @register-success="regSuccess"
         @register-error="regError"
         @server-error="serverError"
@@ -12,7 +12,7 @@
       />
       <Main v-else />
     </v-main>
-    <Dialog :showDialog="dialogOpen" :mainText="dialogText" :titleStyle="dialogStyle" @close="dialogOpen = false" />
+    <Dialog :showDialog="dialogOpen" :mainText="dialogText" :titleStyle="dialogStyle" @close="closeDialog" />
   </v-app>
 </template>
 
@@ -20,6 +20,8 @@
 import UserAuth from './components/UserAuth';
 import Main from './components/Main';
 import Dialog from './components/Dialog';
+import axios from 'axios';
+
 export default {
   name: 'App',
   components: {
@@ -28,11 +30,25 @@ export default {
     Dialog,
   },
   data: () => ({
-    isLogin: true,
+    isLogin: false,
+    loginUsername: null,
     dialogOpen: false,
     dialogText: '',
     dialogStyle: true,
+    dialogLoginSuccess: false,
   }),
+  async created() {
+    try {
+      const {
+        status,
+        data: { username },
+      } = (await axios.post(`${this.$store.state.reqUrl}/user/token-verify`, { auth: localStorage.getItem('userToken') })) || {};
+      this.isLogin = status === 200;
+      this.loginUsername = username;
+    } catch (error) {
+      return;
+    }
+  },
   methods: {
     regSuccess() {
       this.dialogOpen = true;
@@ -49,20 +65,26 @@ export default {
       };
       this.dialogText = `注册失败 , ${errMsg[msg]}`;
     },
-    serverError(msg) {
-      this.dialogOpen = true;
-      this.dialogStyle = false;
-      this.dialogText = `服务器错误 , ${msg}`;
-    },
-    loginSuccess() {
+    loginSuccess(username) {
       this.dialogOpen = true;
       this.dialogStyle = true;
       this.dialogText = '登陆成功';
+      this.loginUsername = username;
+      this.dialogLoginSuccess = true;
     },
     loginError() {
       this.dialogOpen = true;
       this.dialogStyle = false;
       this.dialogText = '登陆失败 , 请检查用户名和密码';
+    },
+    serverError(msg) {
+      this.dialogOpen = true;
+      this.dialogStyle = false;
+      this.dialogText = `服务器错误 , ${msg}`;
+    },
+    closeDialog() {
+      this.dialogOpen = false;
+      this.isLogin = this.dialogLoginSuccess;
     },
   },
 };
