@@ -3,12 +3,16 @@
     <router-view />
     <v-bottom-navigation fixed :value="btmNav" color="primary" grow>
       <v-btn to="/">
-          <span>Home</span>
+          <span>发送信息</span>
+          <v-icon>mdi-send</v-icon>
+      </v-btn>
+      <v-btn to="/history">
+          <span>历史记录</span>
           <v-icon>mdi-history</v-icon>
       </v-btn>
-      <v-btn to="/about">
-          <span>About</span>
-          <v-icon>mdi-heart</v-icon>
+      <v-btn to="/add">
+          <span>添加设备</span>
+          <v-icon>mdi-cellphone-link</v-icon>
       </v-btn>
     </v-bottom-navigation>
   </v-main>
