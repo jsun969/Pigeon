@@ -1,6 +1,13 @@
 <template>
   <v-app>
-    <v-app-bar app color="primary" dark>飞鸽传书</v-app-bar>
+    <v-app-bar app color="primary" dark>
+      <v-toolbar-title>飞鸽传书</v-toolbar-title>
+      <v-spacer></v-spacer>
+      <span v-if="isLogin">欢迎您 , {{ loginUsername }}</span>
+      <v-btn icon v-if="isLogin" @click="logout">
+        <v-icon>mdi-logout</v-icon>
+      </v-btn>
+    </v-app-bar>
     <v-main>
       <UserAuth
         v-if="!isLogin"
@@ -85,6 +92,10 @@ export default {
     closeDialog() {
       this.dialogOpen = false;
       this.isLogin = this.dialogLoginSuccess;
+    },
+    logout() {
+      localStorage.removeItem('userToken');
+      this.isLogin = false;
     },
   },
 };
