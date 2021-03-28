@@ -3,6 +3,7 @@ import VueRouter from 'vue-router';
 import Home from '../views/Home.vue';
 import History from '../views/History.vue';
 import Add from '../views/Add.vue';
+import Setting from '../views/Setting.vue';
 
 Vue.use(VueRouter);
 
@@ -21,6 +22,11 @@ const routes = [
     path: '/add',
     name: 'Add',
     component: Add,
+  },
+  {
+    path: '/setting',
+    name: 'Setting',
+    component: Setting,
   },
   // {
   //   path: '/about',

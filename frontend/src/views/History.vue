@@ -8,8 +8,5 @@
 <script>
 export default {
   name: 'History',
-  components: {
-    // HelloWorld
-  },
 };
 </script>

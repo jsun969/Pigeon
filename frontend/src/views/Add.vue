@@ -8,8 +8,5 @@
 <script>
 export default {
   name: 'Add',
-  components: {
-    // HelloWorld
-  },
 };
 </script>

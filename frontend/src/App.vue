@@ -8,15 +8,15 @@
         <v-icon>mdi-logout</v-icon>
       </v-btn>
     </v-app-bar>
-      <UserAuth
-        v-if="!isLogin"
-        @register-success="regSuccess"
-        @register-error="regError"
-        @server-error="serverError"
-        @login-success="loginSuccess"
-        @login-error="loginError"
-      />
-      <Main v-else />
+    <UserAuth
+      v-if="!isLogin"
+      @register-success="regSuccess"
+      @register-error="regError"
+      @server-error="serverError"
+      @login-success="loginSuccess"
+      @login-error="loginError"
+    />
+    <Main v-else />
     <Dialog :showDialog="dialogOpen" :mainText="dialogText" :titleStyle="dialogStyle" @close="closeDialog" />
   </v-app>
 </template>

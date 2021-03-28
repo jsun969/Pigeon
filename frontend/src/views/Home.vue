@@ -1,6 +1,6 @@
 <template>
   <div class="home">
-    <v-autocomplete chips v-model="selectClass" :items="totClass" label="班级" no-data-text="无符合班级" multiple style="width:80vw"></v-autocomplete>
+    <v-autocomplete chips deletable-chips v-model="selectClass" :items="totClass" label="班级" no-data-text="无符合班级" multiple style="width:80vw"></v-autocomplete>
     <v-textarea outlined no-resize rows="5" name="input-7-4" label="信息" style="width:80vw" v-model="mainText"></v-textarea>
     <v-btn color="primary" elevation="2" large :class="{ 'small-end': $vuetify.breakpoint.name !== 'xs' }">发送</v-btn>
   </div>
