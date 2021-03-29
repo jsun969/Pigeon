@@ -3,13 +3,10 @@
     <v-app-bar app color="primary" dark>
       <v-toolbar-title>飞鸽传书</v-toolbar-title>
       <v-spacer></v-spacer>
-      <span v-if="isLogin">欢迎您 , {{ loginUsername }}</span>
-      <v-btn icon v-if="isLogin" @click="logout">
-        <v-icon>mdi-logout</v-icon>
-      </v-btn>
+      <span v-if="$store.state.isLogin">欢迎您 , {{ loginUsername }}</span>
     </v-app-bar>
     <UserAuth
-      v-if="!isLogin"
+      v-if="!$store.state.isLogin"
       @register-success="regSuccess"
       @register-error="regError"
       @server-error="serverError"
@@ -35,7 +32,6 @@ export default {
     Dialog,
   },
   data: () => ({
-    isLogin: false,
     loginUsername: null,
     dialogOpen: false,
     dialogText: '',
@@ -48,7 +44,7 @@ export default {
         status,
         data: { username },
       } = (await axios.post(`${this.$store.state.reqUrl}/user/token-verify`, { auth: localStorage.getItem('userToken') })) || {};
-      this.isLogin = status === 200;
+      this.$store.state.isLogin = status === 200;
       this.loginUsername = username;
     } catch (error) {
       return;
@@ -89,11 +85,7 @@ export default {
     },
     closeDialog() {
       this.dialogOpen = false;
-      this.isLogin = this.dialogLoginSuccess;
-    },
-    logout() {
-      localStorage.removeItem('userToken');
-      this.isLogin = false;
+      this.$store.state.isLogin = this.dialogLoginSuccess;
     },
   },
 };
