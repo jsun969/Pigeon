@@ -14,7 +14,14 @@
       @login-error="loginError"
     />
     <Main v-else />
-    <Dialog :showDialog="dialogOpen" :mainText="dialogText" :titleStyle="dialogStyle" @close="closeDialog" />
+    <Dialog
+      :showDialog="$store.state.dialog.open"
+      :mainText="$store.state.dialog.text"
+      :titleStyle="$store.state.dialog.style"
+      @close="closeDialog"
+      @confirmClose="confirmCloseDialog"
+      @refuseClose="refuseCloseDialog"
+    />
   </v-app>
 </template>
 
@@ -33,9 +40,6 @@ export default {
   },
   data: () => ({
     loginUsername: null,
-    dialogOpen: false,
-    dialogText: '',
-    dialogStyle: true,
     dialogLoginSuccess: false,
   }),
   async created() {
@@ -52,40 +56,54 @@ export default {
   },
   methods: {
     regSuccess() {
-      this.dialogOpen = true;
-      this.dialogStyle = true;
-      this.dialogText = '注册成功 , 请前往登陆';
+      this.$store.state.dialog.open = true;
+      this.$store.state.dialog.style = 0;
+      this.$store.state.dialog.text = '注册成功 , 请前往登陆';
     },
     regError(msg) {
-      this.dialogOpen = true;
-      this.dialogStyle = false;
+      this.$store.state.dialog.open = true;
+      this.$store.state.dialog.style = 1;
       const errMsg = {
         InviteCodeNotFound: '邀请码不合法',
         InviteCodeIsUsed: '邀请码已失效',
         DuplicateUsername: '用户名已被使用',
       };
-      this.dialogText = `注册失败 , ${errMsg[msg]}`;
+      this.$store.state.dialog.text = `注册失败 , ${errMsg[msg]}`;
     },
     loginSuccess(username) {
-      this.dialogOpen = true;
-      this.dialogStyle = true;
-      this.dialogText = '登陆成功';
+      this.$store.state.dialog.open = true;
+      this.$store.state.dialog.value = 'login';
+      this.$store.state.dialog.style = 0;
+      this.$store.state.dialog.text = '登陆成功';
       this.loginUsername = username;
       this.dialogLoginSuccess = true;
     },
     loginError() {
-      this.dialogOpen = true;
-      this.dialogStyle = false;
-      this.dialogText = '登陆失败 , 请检查用户名和密码';
+      this.$store.state.dialog.open = true;
+      this.$store.state.dialog.style = 1;
+      this.$store.state.dialog.text = '登陆失败 , 请检查用户名和密码';
     },
     serverError(msg) {
-      this.dialogOpen = true;
-      this.dialogStyle = false;
-      this.dialogText = `服务器错误 , ${msg}`;
+      this.$store.state.dialog.open = true;
+      this.$store.state.dialog.style = 1;
+      this.$store.state.dialog.text = `服务器错误 , ${msg}`;
     },
     closeDialog() {
-      this.dialogOpen = false;
-      this.$store.state.isLogin = this.dialogLoginSuccess;
+      this.$store.state.dialog.open = false;
+      if (this.$store.state.dialog.value === 'login') {
+        this.$store.state.isLogin = this.dialogLoginSuccess;
+      }
+    },
+    confirmCloseDialog() {
+      this.$store.state.dialog.open = false;
+      if (this.$store.state.dialog.value === 'logout') {
+        localStorage.removeItem('userToken');
+        this.$store.state.isLogin = false;
+        this.$router.push({ name: 'Home' });
+      }
+    },
+    refuseCloseDialog() {
+      this.$store.state.dialog.open = false;
     },
   },
 };

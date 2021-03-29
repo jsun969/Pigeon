@@ -1,10 +1,11 @@
 <template>
   <div class="setting">
-    <div class="menu">
+    <v-btn text color="primary" v-if="!showMenu" @click="showMenu = true" style="position:fixed;top:67px;left:5px;">&lt;设置</v-btn>
+    <div class="menu" v-if="showMenu">
       <v-list flat width="100vw">
         <div v-for="(item, i) in items" :key="i">
           <v-divider v-if="item.divider" :inset="item.inset"></v-divider>
-          <v-list-item v-if="!item.divider" @click="handleClick(item.click)">
+          <v-list-item v-if="!item.divider" @click="handleClick(item)">
             <v-list-item-icon>
               <v-icon>{{ item.icon }}</v-icon>
             </v-list-item-icon>
@@ -15,9 +16,15 @@
         </div>
       </v-list>
     </div>
-    <!-- <div class="change-password">
-      <h1>lol</h1>
-    </div> -->
+    <div class="password" v-else-if="showPassword">
+      <h1>修改密码</h1>
+    </div>
+    <div class="fullname" v-else-if="showFullname">
+      <h1>修改姓名</h1>
+    </div>
+    <div class="message-style" v-else-if="showMessageStyle">
+      <h1>消息样式</h1>
+    </div>
   </div>
 </template>
 
@@ -27,25 +34,37 @@ export default {
   data: () => ({
     items: [
       { divider: true, inset: false },
-      { icon: 'mdi-form-textbox-password', text: '修改密码', click: '' },
+      { icon: 'mdi-form-textbox-password', text: '修改密码' },
       { divider: true, inset: true },
-      { icon: 'mdi-badge-account-horizontal', text: '修改姓名', click: '' },
+      { icon: 'mdi-badge-account-horizontal', text: '修改姓名' },
       { divider: true, inset: true },
-      { icon: 'mdi-message-question', text: '消息样式', click: '' },
+      { icon: 'mdi-message-question', text: '消息样式' },
       { divider: true, inset: true },
-      { icon: 'mdi-logout', text: '退出登录', click: 'logout' },
+      { icon: 'mdi-logout', text: '退出登录' },
       { divider: true, inset: false },
     ],
+    showMenu: true,
+    showPassword: false,
+    showFullname: false,
+    showMessageStyle: false,
   }),
   methods: {
-    logout() {
-      console.log('lol');
-      localStorage.removeItem('userToken');
-      this.$store.state.isLogin = false;
-      this.$router.push({ path: '/' });
-    },
-    handleClick(clickMethod) {
-      eval(`this.${clickMethod}()`)
+    handleClick(i) {
+      if (i.text === '退出登录') {
+        this.$store.state.dialog.open = true;
+        this.$store.state.dialog.value = 'logout';
+        this.$store.state.dialog.style = 2;
+        this.$store.state.dialog.text = '确定退出当前帐号?';
+      } else if (i.text === '修改密码') {
+        this.showPassword = true;
+        this.showMenu = false;
+      } else if (i.text === '修改姓名') {
+        this.showFullname = true;
+        this.showMenu = false;
+      } else if (i.text === '消息样式') {
+        this.showMessageStyle = true;
+        this.showMenu = false;
+      }
     },
   },
 };
