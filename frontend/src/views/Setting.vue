@@ -5,7 +5,7 @@
       <v-list flat width="100vw">
         <div v-for="(item, i) in items" :key="i">
           <v-divider v-if="item.divider" :inset="item.inset"></v-divider>
-          <v-list-item v-if="!item.divider" @click="handleClick(item)">
+          <v-list-item v-if="!item.divider" @click="handleClick(item.text)">
             <v-list-item-icon>
               <v-icon>{{ item.icon }}</v-icon>
             </v-list-item-icon>
@@ -49,19 +49,19 @@ export default {
     showMessageStyle: false,
   }),
   methods: {
-    handleClick(i) {
-      if (i.text === '退出登录') {
+    handleClick(itemText) {
+      if (itemText === '退出登录') {
         this.$store.state.dialog.open = true;
         this.$store.state.dialog.value = 'logout';
         this.$store.state.dialog.style = 2;
         this.$store.state.dialog.text = '确定退出当前帐号?';
-      } else if (i.text === '修改密码') {
+      } else if (itemText === '修改密码') {
         this.showPassword = true;
         this.showMenu = false;
-      } else if (i.text === '修改姓名') {
+      } else if (itemText === '修改姓名') {
         this.showFullname = true;
         this.showMenu = false;
-      } else if (i.text === '消息样式') {
+      } else if (itemText === '消息样式') {
         this.showMessageStyle = true;
         this.showMenu = false;
       }

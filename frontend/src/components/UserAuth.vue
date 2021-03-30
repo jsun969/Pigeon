@@ -8,7 +8,14 @@
       <v-tabs-items v-model="tab">
         <v-tab-item>
           <v-text-field v-model="loginName" label="用户名" @keyup.enter="login"></v-text-field>
-          <v-text-field v-model="loginPwd" label="密码" type="password" @keyup.enter="login"></v-text-field>
+          <v-text-field
+            v-model="loginPwd"
+            label="密码"
+            :type="showLoginPwd ? 'text' : 'password'"
+            @keyup.enter="login"
+            :append-icon="showLoginPwd ? 'mdi-eye' : 'mdi-eye-off'"
+            @click:append="showLoginPwd = !showLoginPwd"
+          ></v-text-field>
           <v-btn color="primary" elevation="2" large :disabled="isLoginBtnDisabled" @click="login">登录</v-btn>
         </v-tab-item>
         <v-tab-item>
@@ -22,18 +29,25 @@
           <v-text-field
             v-model="registerPwd1"
             label="密码"
-            type="password"
+            :type="showRegPwd ? 'text' : 'password'"
             :rules="pwdRules"
             @update:error="isRegPwd1Err = $event"
             @keyup.enter="register"
-          ></v-text-field>
+            :append-icon="showRegPwd ? 'mdi-eye' : 'mdi-eye-off'"
+            @click:append="showRegPwd = !showRegPwd"
+            counter
+          >
+          </v-text-field>
           <v-text-field
             v-model="registerPwd2"
             label="重复密码"
-            type="password"
+            :type="showRegPwd ? 'text' : 'password'"
             :rules="rePwdRule"
             @update:error="isRegPwd2Err = $event"
             @keyup.enter="register"
+            :append-icon="showRegPwd ? 'mdi-eye' : 'mdi-eye-off'"
+            @click:append="showRegPwd = !showRegPwd"
+            :counter="registerPwd1.length"
           ></v-text-field>
           <v-text-field v-model="registerInviteCode" label="邀请码" @keyup.enter="register"></v-text-field>
           <v-btn color="primary" elevation="2" large @click="register" :disabled="isRegBtnDisabled">注册</v-btn>
@@ -52,13 +66,16 @@ export default {
     tab: 0,
     loginName: '',
     loginPwd: '',
+    showLoginPwd: false,
     registerName: '',
     isRegNameErr: false,
+    showRegPwd: false,
     registerPwd1: '',
     isRegPwd1Err: false,
     registerPwd2: '',
     isRegPwd2Err: false,
     registerInviteCode: '',
+    // todo: show password complexity with vuetify text field progress
     nameRules: [
       value => (value || '').length <= 20 || !value || '最多20个字符',
       value => (value || '').length >= 4 || !value || '至少4个字符',
