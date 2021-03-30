@@ -1,67 +1,71 @@
 <template>
   <v-main>
-    <v-card :height="[400, 500][tab]">
-      <v-tabs v-model="tab" grow>
-        <v-tab>登录</v-tab>
-        <v-tab>注册</v-tab>
-      </v-tabs>
-      <v-tabs-items v-model="tab">
-        <v-tab-item height="10">
-          <v-text-field v-model="loginName" label="用户名" @keyup.enter="login"></v-text-field>
-          <v-text-field
-            v-model="loginPwd"
-            label="密码"
-            :type="showLoginPwd ? 'text' : 'password'"
-            @keyup.enter="login"
-            :append-icon="showLoginPwd ? 'mdi-eye' : 'mdi-eye-off'"
-            @click:append="showLoginPwd = !showLoginPwd"
-          ></v-text-field>
-          <v-btn color="primary" elevation="2" large :disabled="isLoginBtnDisabled" @click="login">登录</v-btn>
-        </v-tab-item>
-        <v-tab-item>
-          <v-text-field
-            v-model="registerName"
-            label="姓名"
-            :rules="nameRules"
-            @update:error="isRegNameErr = $event"
-            @keyup.enter="register"
-            width="10px"
-          ></v-text-field>
-          <v-text-field
-            v-model="registerName"
-            label="用户名"
-            :rules="nameRules"
-            @update:error="isRegNameErr = $event"
-            @keyup.enter="register"
-          ></v-text-field>
-          <v-text-field
-            v-model="registerPwd1"
-            label="密码"
-            :type="showRegPwd ? 'text' : 'password'"
-            :rules="pwdRules"
-            @update:error="isRegPwd1Err = $event"
-            @keyup.enter="register"
-            :append-icon="showRegPwd ? 'mdi-eye' : 'mdi-eye-off'"
-            @click:append="showRegPwd = !showRegPwd"
-            counter
-          >
-          </v-text-field>
-          <v-text-field
-            v-model="registerPwd2"
-            label="重复密码"
-            :type="showRegPwd ? 'text' : 'password'"
-            :rules="rePwdRule"
-            @update:error="isRegPwd2Err = $event"
-            @keyup.enter="register"
-            :append-icon="showRegPwd ? 'mdi-eye' : 'mdi-eye-off'"
-            @click:append="showRegPwd = !showRegPwd"
-            :counter="registerPwd1.length"
-          ></v-text-field>
-          <v-text-field v-model="registerInviteCode" label="邀请码" @keyup.enter="register"></v-text-field>
-          <v-btn color="primary" elevation="2" large @click="register" :disabled="isRegBtnDisabled">注册</v-btn>
-        </v-tab-item>
-      </v-tabs-items>
-    </v-card>
+    <v-container fill-height fluid>
+      <v-row align="center" justify="center">
+        <v-card :height="[300, 500][tab]" width="360" style="margin:0px 20px">
+          <v-tabs v-model="tab" grow>
+            <v-tab>登录</v-tab>
+            <v-tab>注册</v-tab>
+          </v-tabs>
+          <v-tabs-items v-model="tab" style="padding:20px">
+            <v-tab-item>
+              <v-text-field v-model="loginName" label="用户名" @keyup.enter="login"></v-text-field>
+              <v-text-field
+                v-model="loginPwd"
+                label="密码"
+                :type="showLoginPwd ? 'text' : 'password'"
+                @keyup.enter="login"
+                :append-icon="showLoginPwd ? 'mdi-eye' : 'mdi-eye-off'"
+                @click:append="showLoginPwd = !showLoginPwd"
+              ></v-text-field>
+              <v-btn block color="primary" elevation="2" large :disabled="isLoginBtnDisabled" @click="login">登录</v-btn>
+            </v-tab-item>
+            <v-tab-item>
+              <v-text-field
+                v-model="registerName"
+                label="姓名"
+                :rules="nameRules"
+                @update:error="isRegNameErr = $event"
+                @keyup.enter="register"
+                width="10px"
+              ></v-text-field>
+              <v-text-field
+                v-model="registerName"
+                label="用户名"
+                :rules="nameRules"
+                @update:error="isRegNameErr = $event"
+                @keyup.enter="register"
+              ></v-text-field>
+              <v-text-field
+                v-model="registerPwd1"
+                label="密码"
+                :type="showRegPwd ? 'text' : 'password'"
+                :rules="pwdRules"
+                @update:error="isRegPwd1Err = $event"
+                @keyup.enter="register"
+                :append-icon="showRegPwd ? 'mdi-eye' : 'mdi-eye-off'"
+                @click:append="showRegPwd = !showRegPwd"
+                counter
+              >
+              </v-text-field>
+              <v-text-field
+                v-model="registerPwd2"
+                label="重复密码"
+                :type="showRegPwd ? 'text' : 'password'"
+                :rules="rePwdRule"
+                @update:error="isRegPwd2Err = $event"
+                @keyup.enter="register"
+                :append-icon="showRegPwd ? 'mdi-eye' : 'mdi-eye-off'"
+                @click:append="showRegPwd = !showRegPwd"
+                :counter="registerPwd1.length"
+              ></v-text-field>
+              <v-text-field v-model="registerInviteCode" label="邀请码" @keyup.enter="register"></v-text-field>
+              <v-btn block color="primary" elevation="2" large @click="register" :disabled="isRegBtnDisabled">注册</v-btn>
+            </v-tab-item>
+          </v-tabs-items>
+        </v-card>
+      </v-row>
+    </v-container>
   </v-main>
 </template>
 
@@ -167,30 +171,5 @@ export default {
       return !this.loginName || !this.loginPwd;
     },
   },
-  watch: {
-    tab() {
-      console.log(document.getElementsByClassName('v-window-item')[this.tab]);
-      document.getElementsByClassName('v-window-item')[this.tab].style.setProperty('height', ['320px', '420px'][this.tab]);
-    },
-  },
 };
 </script>
-
-<style lang="scss">
-.v-main__wrap {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  .v-card {
-    width: 360px;
-    margin: 0px 20px;
-    .v-window-item {
-      padding: 40px;
-      height: 320px;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-around;
-    }
-  }
-}
-</style>
