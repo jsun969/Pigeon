@@ -25,6 +25,9 @@
     <div class="message-style" v-else-if="showMessageStyle">
       <h1>消息样式</h1>
     </div>
+    <div class="theme" v-else-if="showTheme">
+      <h1>切换主题</h1>
+    </div>
   </div>
 </template>
 
@@ -40,6 +43,8 @@ export default {
       { divider: true, inset: true },
       { icon: 'mdi-message-question', text: '消息样式' },
       { divider: true, inset: true },
+      { icon: 'mdi-compare', text: '切换主题' },
+      { divider: true, inset: true },
       { icon: 'mdi-logout', text: '退出登录' },
       { divider: true, inset: false },
     ],
@@ -47,6 +52,7 @@ export default {
     showPassword: false,
     showFullname: false,
     showMessageStyle: false,
+    showTheme: false,
   }),
   methods: {
     handleClick(itemText) {
@@ -63,6 +69,9 @@ export default {
         this.showMenu = false;
       } else if (itemText === '消息样式') {
         this.showMessageStyle = true;
+        this.showMenu = false;
+      } else if (itemText === '切换主题') {
+        this.showTheme = true;
         this.showMenu = false;
       }
     },

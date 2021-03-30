@@ -1,12 +1,12 @@
 <template>
   <v-main>
-    <v-card>
+    <v-card :height="[400, 500][tab]">
       <v-tabs v-model="tab" grow>
         <v-tab>登录</v-tab>
         <v-tab>注册</v-tab>
       </v-tabs>
       <v-tabs-items v-model="tab">
-        <v-tab-item>
+        <v-tab-item height="10">
           <v-text-field v-model="loginName" label="用户名" @keyup.enter="login"></v-text-field>
           <v-text-field
             v-model="loginPwd"
@@ -19,6 +19,14 @@
           <v-btn color="primary" elevation="2" large :disabled="isLoginBtnDisabled" @click="login">登录</v-btn>
         </v-tab-item>
         <v-tab-item>
+          <v-text-field
+            v-model="registerName"
+            label="姓名"
+            :rules="nameRules"
+            @update:error="isRegNameErr = $event"
+            @keyup.enter="register"
+            width="10px"
+          ></v-text-field>
           <v-text-field
             v-model="registerName"
             label="用户名"
@@ -77,7 +85,7 @@ export default {
     registerInviteCode: '',
     // todo: show password complexity with vuetify text field progress
     nameRules: [
-      value => (value || '').length <= 20 || !value || '最多20个字符',
+      value => (value || '').length <= 10 || !value || '最多10个字符',
       value => (value || '').length >= 4 || !value || '至少4个字符',
       value => {
         const pattern = /^[a-zA-Z0-9_-]{4,16}$/;
@@ -159,6 +167,12 @@ export default {
       return !this.loginName || !this.loginPwd;
     },
   },
+  watch: {
+    tab() {
+      console.log(document.getElementsByClassName('v-window-item')[this.tab]);
+      document.getElementsByClassName('v-window-item')[this.tab].style.setProperty('height', ['320px', '420px'][this.tab]);
+    },
+  },
 };
 </script>
 
@@ -168,7 +182,6 @@ export default {
   justify-content: center;
   align-items: center;
   .v-card {
-    height: 400px;
     width: 360px;
     margin: 0px 20px;
     .v-window-item {
