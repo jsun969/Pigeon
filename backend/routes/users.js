@@ -48,17 +48,20 @@ router.get('/invite-codes', async (req, res) => {
 // Register
 router.post('/register', async (req, res) => {
   try {
-    const doc = await User.findOne({ username: req.body.username });
-    if (!doc) {
-      const codeDoc = await InviteCode.findOneAndUpdate({ code: req.body.inviteCode }, { username: req.body.username });
+    const nameDoc = await User.findOne({ username: req.body.username });
+    if (!nameDoc) {
+      const codeDoc = await InviteCode.findOne({ code: req.body.inviteCode });
       if (!codeDoc) {
         console.log(`User [ ${req.body.username} ] try to register, but the invite code is wrong.`);
         res.status(404).json({ error: 'InviteCodeNotFound' });
       } else if (codeDoc.username) {
+        console.log(codeDoc);
         console.log(`User [ ${req.body.username} ] try to register, but the invite code has been used.`);
         res.status(404).json({ error: 'InviteCodeIsUsed' });
       } else {
+        await InviteCode.findOneAndUpdate({ code: req.body.inviteCode }, { username: req.body.username });
         const user = new User({
+          fullName: req.body.fullName,
           username: req.body.username,
           password: crypto.createHash('sha256').update(req.body.password).digest('hex'),
         });
@@ -83,7 +86,7 @@ router.post('/login', async (req, res) => {
       username: req.body.username,
       password: crypto.createHash('sha256').update(req.body.password).digest('hex'),
     });
-    if (doc !== null) {
+    if (doc) {
       console.log(`User [ ${req.body.username} ] login successfully.`);
       const token = jwt.sign({ userId: doc._id }, cfg.token.secret, { expiresIn: cfg.token.maxAge });
       res.json({ token });

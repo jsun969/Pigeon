@@ -2,7 +2,7 @@
   <v-main>
     <v-container fill-height fluid>
       <v-row align="center" justify="center">
-        <v-card :height="[300, 500][tab]" width="360" style="margin:0px 20px">
+        <v-card :height="tab ? 500 : 300" width="320" style="margin:0px 20px">
           <v-tabs v-model="tab" grow>
             <v-tab>登录</v-tab>
             <v-tab>注册</v-tab>
@@ -18,22 +18,21 @@
                 :append-icon="showLoginPwd ? 'mdi-eye' : 'mdi-eye-off'"
                 @click:append="showLoginPwd = !showLoginPwd"
               ></v-text-field>
-              <v-btn block color="primary" elevation="2" large :disabled="isLoginBtnDisabled" @click="login">登录</v-btn>
+              <v-btn block color="primary" elevation="2" large :disabled="!loginName || !loginPwd" @click="login">登录</v-btn>
             </v-tab-item>
             <v-tab-item>
               <v-text-field
-                v-model="registerName"
+                v-model="registerFullName"
                 label="姓名"
-                :rules="nameRules"
-                @update:error="isRegNameErr = $event"
+                :rules="fullNameRules"
+                @update:error="isRegErr = $event"
                 @keyup.enter="register"
-                width="10px"
               ></v-text-field>
               <v-text-field
                 v-model="registerName"
                 label="用户名"
                 :rules="nameRules"
-                @update:error="isRegNameErr = $event"
+                @update:error="isRegErr = $event"
                 @keyup.enter="register"
               ></v-text-field>
               <v-text-field
@@ -41,7 +40,7 @@
                 label="密码"
                 :type="showRegPwd ? 'text' : 'password'"
                 :rules="pwdRules"
-                @update:error="isRegPwd1Err = $event"
+                @update:error="isRegErr = $event"
                 @keyup.enter="register"
                 :append-icon="showRegPwd ? 'mdi-eye' : 'mdi-eye-off'"
                 @click:append="showRegPwd = !showRegPwd"
@@ -52,15 +51,23 @@
                 v-model="registerPwd2"
                 label="重复密码"
                 :type="showRegPwd ? 'text' : 'password'"
-                :rules="rePwdRule"
-                @update:error="isRegPwd2Err = $event"
+                :rules="[registerPwd1 === registerPwd2 || !registerPwd2 || '重复密码不正确']"
+                @update:error="isRegErr = $event"
                 @keyup.enter="register"
                 :append-icon="showRegPwd ? 'mdi-eye' : 'mdi-eye-off'"
                 @click:append="showRegPwd = !showRegPwd"
                 :counter="registerPwd1.length"
               ></v-text-field>
               <v-text-field v-model="registerInviteCode" label="邀请码" @keyup.enter="register"></v-text-field>
-              <v-btn block color="primary" elevation="2" large @click="register" :disabled="isRegBtnDisabled">注册</v-btn>
+              <v-btn
+                block
+                color="primary"
+                elevation="2"
+                large
+                @click="register"
+                :disabled="!registerName || !registerPwd1 || !registerPwd2 || !registerInviteCode || isRegErr"
+                >注册</v-btn
+              >
             </v-tab-item>
           </v-tabs-items>
         </v-card>
@@ -79,15 +86,23 @@ export default {
     loginName: '',
     loginPwd: '',
     showLoginPwd: false,
+    registerFullName: '',
     registerName: '',
-    isRegNameErr: false,
     showRegPwd: false,
     registerPwd1: '',
-    isRegPwd1Err: false,
     registerPwd2: '',
-    isRegPwd2Err: false,
+    isRegErr: false,
     registerInviteCode: '',
     // todo: show password complexity with vuetify text field progress
+    fullNameRules: [
+      value => (value || '').length <= 20 || !value || '最多20个字符',
+      value => (value || '').length >= 2 || !value || '至少2个字符',
+      value => {
+        // Support Chinese names include minorities
+        const pattern = /^[\u4E00-\u9FA5]+(·[\u4E00-\u9FA5]+)*$/;
+        return pattern.test(value) || !value || '姓名无效';
+      },
+    ],
     nameRules: [
       value => (value || '').length <= 10 || !value || '最多10个字符',
       value => (value || '').length >= 4 || !value || '至少4个字符',
@@ -109,8 +124,8 @@ export default {
     async register() {
       if (this.isRegBtnDisabled) return;
       try {
-        const { registerName: username, registerPwd1: password, registerInviteCode: inviteCode } = this;
-        const userData = { username, password, inviteCode };
+        const { registerFullName: fullName, registerName: username, registerPwd1: password, registerInviteCode: inviteCode } = this;
+        const userData = { fullName, username, password, inviteCode };
         const { status } = (await axios.post(`${this.$store.state.reqUrl}/user/register`, userData)) || {};
         if (status === 200) {
           this.$emit('register-success');
@@ -156,19 +171,6 @@ export default {
       }
       this.loginName = '';
       this.loginPwd = '';
-    },
-  },
-  computed: {
-    rePwdRule() {
-      return [(this.registerPwd1 === this.registerPwd2 && !this.isRegPwd1Err) || !this.registerPwd2 || '重复密码不正确'];
-    },
-    isRegBtnDisabled() {
-      const isEmpty = !this.registerName || !this.registerPwd1 || !this.registerPwd2 || !this.registerInviteCode;
-      const haveError = this.isRegNameErr || this.isRegPwd1Err || this.isRegPwd2Err;
-      return isEmpty || haveError;
-    },
-    isLoginBtnDisabled() {
-      return !this.loginName || !this.loginPwd;
     },
   },
 };

@@ -1,8 +1,8 @@
 <template>
-  <div class="setting">
+  <div class="setting" style="margin-top:30px">
     <v-btn text color="primary" v-if="!showMenu" @click="showMenu = true" style="position:fixed;top:67px;left:5px;">&lt;设置</v-btn>
     <div class="menu" v-if="showMenu">
-      <v-list flat width="100vw">
+      <v-list flat>
         <div v-for="(item, i) in items" :key="i">
           <v-divider v-if="item.divider" :inset="item.inset"></v-divider>
           <v-list-item v-if="!item.divider" @click="handleClick(item.text)">
