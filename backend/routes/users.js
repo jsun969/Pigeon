@@ -55,7 +55,6 @@ router.post('/register', async (req, res) => {
         console.log(`User [ ${req.body.username} ] try to register, but the invite code is wrong.`);
         res.status(404).json({ error: 'InviteCodeNotFound' });
       } else if (codeDoc.username) {
-        console.log(codeDoc);
         console.log(`User [ ${req.body.username} ] try to register, but the invite code has been used.`);
         res.status(404).json({ error: 'InviteCodeIsUsed' });
       } else {
@@ -67,7 +66,7 @@ router.post('/register', async (req, res) => {
         });
         userRes = await user.save();
         console.log(`User [ ${userRes.username} ] register successfully!`);
-        res.sendStatus(200);
+        res.sendStatus(201);
       }
     } else {
       console.log(`User [ ${req.body.username} ] has already registered.`);
@@ -103,10 +102,46 @@ router.post('/login', async (req, res) => {
 // Verify token of logged user
 router.post('/token-verify', async (req, res) => {
   try {
-    const decoded = jwt.verify(req.body.auth, cfg.token.secret);
-    const { username } = await User.findById(decoded.userId);
+    const { userId } = jwt.verify(req.body.auth, cfg.token.secret);
+    const { username } = await User.findById(userId);
     console.log(`User [ ${username} ] login with token successfully.`);
     res.json({ username });
+  } catch (error) {
+    res.status(500).send({ error });
+  }
+});
+
+// Change password
+router.patch('/password', async (req, res) => {
+  try {
+    const { userId } = jwt.verify(req.headers.auth, cfg.token.secret);
+    const { password: oldPassword, username } = await User.findById(userId);
+    if (oldPassword === crypto.createHash('sha256').update(req.body.oldPassword).digest('hex')) {
+      await User.findByIdAndUpdate(userId, { password: crypto.createHash('sha256').update(req.body.newPassword).digest('hex') });
+      console.log(`User [ ${username} ] change password successfully.`);
+      res.sendStatus(200);
+    } else {
+      console.log(`User [ ${username} ] try to change password but old password is wrong.`);
+      res.status(404).json({ error: 'OldPasswordError' });
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).send({ error });
+  }
+});
+// Change full name
+router.patch('/full-name', async (req, res) => {
+  try {
+    const { userId } = jwt.verify(req.headers.auth, cfg.token.secret);
+    const { fullName: oldFullName, username } = await User.findById(userId);
+    if (oldFullName === req.body.oldFullName) {
+      await User.findByIdAndUpdate(userId, { fullName: req.body.newFullName });
+      console.log(`User [ ${username} ] change full name successfully.`);
+      res.sendStatus(200);
+    } else {
+      console.log(`User [ ${username} ] try to change full name but old full name is wrong.`);
+      res.status(404).json({ error: 'OldFullNameError' });
+    }
   } catch (error) {
     console.error(error);
     res.status(500).send({ error });
