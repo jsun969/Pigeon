@@ -57,10 +57,7 @@ export default {
   methods: {
     handleClick(itemText) {
       if (itemText === '退出登录') {
-        this.$store.state.dialog.open = true;
-        this.$store.state.dialog.value = 'logout';
-        this.$store.state.dialog.style = 2;
-        this.$store.state.dialog.text = '确定退出当前帐号?';
+        this.$store.commit('showDialog', { value: 'Logout', style: 2, text: '确定退出当前帐号?' });
       } else if (itemText === '修改密码') {
         this.showPassword = true;
         this.showMenu = false;

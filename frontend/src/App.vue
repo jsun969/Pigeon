@@ -48,7 +48,7 @@ export default {
         status,
         data: { username },
       } = (await axios.post(`${this.$store.state.reqUrl}/user/token-verify`, { auth: localStorage.getItem('userToken') })) || {};
-      this.$store.state.isLogin = status === 200;
+      this.$store.commit('userLogin', { value: status === 200 });
       this.loginUsername = username;
     } catch (error) {
       return;
@@ -56,54 +56,43 @@ export default {
   },
   methods: {
     regSuccess() {
-      this.$store.state.dialog.open = true;
-      this.$store.state.dialog.style = 0;
-      this.$store.state.dialog.text = '注册成功 , 请前往登陆';
+      this.$store.commit('showDialog', { value: 'RegisterSuccess', style: 0, text: '注册成功 , 请前往登陆' });
     },
     regError(msg) {
-      this.$store.state.dialog.open = true;
-      this.$store.state.dialog.style = 1;
       const errMsg = {
         InviteCodeNotFound: '邀请码不合法',
         InviteCodeIsUsed: '邀请码已失效',
         DuplicateUsername: '用户名已被使用',
       };
-      this.$store.state.dialog.text = `注册失败 , ${errMsg[msg]}`;
+      this.$store.commit('showDialog', { value: 'RegisterError', style: 1, text: `注册失败 , ${errMsg[msg]}` });
     },
     loginSuccess(username) {
-      this.$store.state.dialog.open = true;
-      this.$store.state.dialog.value = 'login';
-      this.$store.state.dialog.style = 0;
-      this.$store.state.dialog.text = '登陆成功';
+      this.$store.commit('showDialog', { value: 'LoginSuccess', style: 0, text: '登陆成功' });
       this.loginUsername = username;
       this.dialogLoginSuccess = true;
     },
     loginError() {
-      this.$store.state.dialog.open = true;
-      this.$store.state.dialog.style = 1;
-      this.$store.state.dialog.text = '登陆失败 , 请检查用户名和密码';
+      this.$store.commit('showDialog', { value: 'LoginError', style: 1, text: '登陆失败 , 请检查用户名和密码' });
     },
     serverError(msg) {
-      this.$store.state.dialog.open = true;
-      this.$store.state.dialog.style = 1;
-      this.$store.state.dialog.text = `服务器错误 , ${msg}`;
+      this.$store.commit('showDialog', { value: 'ServerError', style: 1, text: `服务器错误 , ${msg}` });
     },
     closeDialog() {
-      this.$store.state.dialog.open = false;
-      if (this.$store.state.dialog.value === 'login') {
-        this.$store.state.isLogin = this.dialogLoginSuccess;
+      this.$store.commit('closeDialog');
+      if (this.$store.state.dialog.value === 'LoginSuccess') {
+        this.$store.commit('userLogin', { value: this.dialogLoginSuccess });
       }
     },
     confirmCloseDialog() {
-      this.$store.state.dialog.open = false;
-      if (this.$store.state.dialog.value === 'logout') {
+      this.$store.commit('closeDialog');
+      if (this.$store.state.dialog.value === 'Logout') {
         localStorage.removeItem('userToken');
-        this.$store.state.isLogin = false;
+        this.$store.commit('userLogin', { value: false });
         this.$router.push({ name: 'Home' });
       }
     },
     refuseCloseDialog() {
-      this.$store.state.dialog.open = false;
+      this.$store.commit('closeDialog');
     },
   },
 };

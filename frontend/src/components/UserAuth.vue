@@ -127,7 +127,7 @@ export default {
         const { registerFullName: fullName, registerName: username, registerPwd1: password, registerInviteCode: inviteCode } = this;
         const userData = { fullName, username, password, inviteCode };
         const { status } = (await axios.post(`${this.$store.state.reqUrl}/user/register`, userData)) || {};
-        if (status === 200) {
+        if (status === 201) {
           this.$emit('register-success');
         }
       } catch ({
