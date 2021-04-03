@@ -156,6 +156,7 @@ export default {
         if (status === 200) {
           this.$emit('login-success', username);
           localStorage.setItem('userToken', data.token);
+          axios.defaults.headers.common['auth'] = data.token;
         }
       } catch ({
         response: {

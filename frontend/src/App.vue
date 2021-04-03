@@ -3,7 +3,7 @@
     <v-app-bar app color="primary" dark>
       <v-toolbar-title>飞鸽传书</v-toolbar-title>
       <v-spacer></v-spacer>
-      <span v-if="$store.state.isLogin">欢迎您 , {{ loginUsername }}</span>
+      <span v-if="$store.state.isLogin">欢迎您 , {{ loginFullName }}老师</span>
     </v-app-bar>
     <UserAuth
       v-if="!$store.state.isLogin"
@@ -39,17 +39,20 @@ export default {
     Dialog,
   },
   data: () => ({
-    loginUsername: null,
+    loginFullName: null,
     dialogLoginSuccess: false,
   }),
   async created() {
     try {
       const {
         status,
-        data: { username },
+        data: { fullName },
       } = (await axios.post(`${this.$store.state.reqUrl}/user/token-verify`, { auth: localStorage.getItem('userToken') })) || {};
-      this.$store.commit('userLogin', { value: status === 200 });
-      this.loginUsername = username;
+      if (status === 200) {
+        this.$store.commit('userLogin', { value: true });
+        axios.defaults.headers.common['auth'] = localStorage.getItem('userToken');
+        this.loginFullName = fullName;
+      }
     } catch (error) {
       return;
     }
