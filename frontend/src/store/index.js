@@ -5,7 +5,6 @@ Vue.use(Vuex);
 
 export default new Vuex.Store({
   state: {
-    reqUrl: 'http://localhost:3000',
     isLogin: false,
     dialog: {
       value: '',
@@ -13,6 +12,7 @@ export default new Vuex.Store({
       text: '',
       style: 0,
     },
+    userFullName: null,
   },
   mutations: {
     userLogin(state, payload) {
@@ -24,8 +24,11 @@ export default new Vuex.Store({
       state.dialog.style = payload.style;
       state.dialog.text = payload.text;
     },
-    closeDialog(state) {
+    hideDialog(state) {
       state.dialog.open = false;
+    },
+    setFullName(state, payload) {
+      state.userFullName = payload.fullName;
     },
   },
   actions: {},

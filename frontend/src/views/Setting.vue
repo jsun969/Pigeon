@@ -34,7 +34,7 @@
             v-model="newPassword1"
             label="新密码"
             outlined
-            :rules="pwdRules.concat([newPassword1 !== oldPassword || !newPassword1 || '与原密码相同'])"
+            :rules="[...pwdRules, newPassword1 !== oldPassword || !newPassword1 || '与原密码相同']"
             @update:error="isNewPwdErr = $event"
             :append-icon="showNewPwd ? 'mdi-eye' : 'mdi-eye-off'"
             :type="showNewPwd ? 'text' : 'password'"
@@ -98,9 +98,9 @@ export default {
       { icon: 'mdi-logout', text: '退出登录' },
       { divider: true, inset: false },
     ],
-    showMenu: false,
+    showMenu: true,
     showItem: {
-      password: true,
+      password: false,
       fullname: false,
       messageStyle: false,
       theme: false,
@@ -150,7 +150,7 @@ export default {
     async changePassword() {
       try {
         const { oldPassword, newPassword1: newPassword } = this;
-        const { status } = (await axios.patch(`${this.$store.state.reqUrl}/user/password`, { oldPassword, newPassword })) || {};
+        const { status } = (await axios.patch('/user/password', { oldPassword, newPassword })) || {};
         if (status === 200) {
           this.$store.commit('showDialog', { value: 'ChangePasswordSuccess', style: 0, text: '修改密码成功 , 请重新登陆' });
           this.$store.commit('userLogin', { value: false });

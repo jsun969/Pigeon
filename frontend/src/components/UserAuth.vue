@@ -77,6 +77,7 @@
 </template>
 
 <script>
+import { mapMutations } from 'vuex';
 import axios from 'axios';
 
 export default {
@@ -126,9 +127,9 @@ export default {
       try {
         const { registerFullName: fullName, registerName: username, registerPwd1: password, registerInviteCode: inviteCode } = this;
         const userData = { fullName, username, password, inviteCode };
-        const { status } = (await axios.post(`${this.$store.state.reqUrl}/user/register`, userData)) || {};
+        const { status } = (await axios.post('/user/register', userData)) || {};
         if (status === 201) {
-          this.$emit('register-success');
+          this.showDialog({ value: 'RegisterSuccess', style: 0, text: '注册成功 , 请前往登陆' });
         }
       } catch ({
         response: {
@@ -137,9 +138,14 @@ export default {
         },
       }) {
         if (status === 404) {
-          this.$emit('register-error', error);
+          const errMsg = {
+            InviteCodeNotFound: '邀请码不合法',
+            InviteCodeIsUsed: '邀请码已失效',
+            DuplicateUsername: '用户名已被使用',
+          };
+          this.showDialog({ value: 'RegisterError', style: 1, text: `注册失败 , ${errMsg[error]}` });
         } else if (status === 500) {
-          this.$emit('server-error', error.code);
+          this.showDialog({ value: 'ServerError', style: 1, text: `服务器错误 , ${error.code}` });
         }
       }
       this.registerName = '';
@@ -152,11 +158,11 @@ export default {
       try {
         const { loginName: username, loginPwd: password } = this;
         const userData = { username, password };
-        const { status, data } = (await axios.post(`${this.$store.state.reqUrl}/user/login`, userData)) || {};
+        const { status, data } = (await axios.post('/user/login', userData)) || {};
         if (status === 200) {
-          this.$emit('login-success', username);
           localStorage.setItem('userToken', data.token);
           axios.defaults.headers.common['auth'] = data.token;
+          this.showDialog({ value: 'LoginSuccess', style: 0, text: '登陆成功' });
         }
       } catch ({
         response: {
@@ -165,14 +171,15 @@ export default {
         },
       }) {
         if (status === 404) {
-          this.$emit('login-error');
+          this.showDialog({ value: 'LoginError', style: 1, text: '登陆失败 , 请检查用户名和密码' });
         } else if (status === 500) {
-          this.$emit('server-error', error.code);
+          this.showDialog({ value: 'ServerError', style: 1, text: `服务器错误 , ${error.code}` });
         }
       }
       this.loginName = '';
       this.loginPwd = '';
     },
+    ...mapMutations(['showDialog']),
   },
 };
 </script>
