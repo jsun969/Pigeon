@@ -13,6 +13,7 @@ export default new Vuex.Store({
       style: 0,
     },
     userFullName: null,
+    newFullNameWhenChange: null,
   },
   mutations: {
     userLogin(state, payload) {
@@ -29,6 +30,9 @@ export default new Vuex.Store({
     },
     setFullName(state, payload) {
       state.userFullName = payload.fullName;
+    },
+    setNewFullNameWhenChange(state, payload) {
+      state.newFullNameWhenChange = payload.fullName;
     },
   },
   actions: {},

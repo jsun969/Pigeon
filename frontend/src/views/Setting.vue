@@ -67,8 +67,28 @@
         </v-row>
       </v-container>
     </div>
-    <div class="fullname" v-else-if="showItem.fullname">
-      <h1>修改姓名</h1>
+    <div class="fullname" v-else-if="showItem.fullname" style="padding:25px;">
+      <v-container>
+        <v-row>
+          <v-text-field
+            v-model="newFullName"
+            label="新姓名"
+            outlined
+            @update:error="isNewFullNameErr = $event"
+            :rules="[...fullNameRules, newFullName !== userFullName || !newFullName || '与旧姓名相同']"
+          ></v-text-field>
+        </v-row>
+        <v-row align="center" justify="center">
+          <v-btn
+            large
+            color="primary"
+            :block="$vuetify.breakpoint.name == 'xs'"
+            :disabled="!newFullName || newFullNameErr"
+            @click="changeFullName"
+            >确定</v-btn
+          >
+        </v-row>
+      </v-container>
     </div>
     <div class="message-style" v-else-if="showItem.messageStyle">
       <h1>消息样式</h1>
@@ -80,6 +100,7 @@
 </template>
 
 <script>
+import { mapState, mapMutations } from 'vuex';
 import axios from 'axios';
 
 export default {
@@ -119,11 +140,22 @@ export default {
       },
     ],
     isNewPwdErr: false,
+    newFullName: '',
+    newFullNameErr: false,
+    fullNameRules: [
+      value => (value || '').length <= 20 || !value || '最多20个字符',
+      value => (value || '').length >= 2 || !value || '至少2个字符',
+      value => {
+        // 支持中文名(包括少数民族)
+        const pattern = /^[\u4E00-\u9FA5]+(·[\u4E00-\u9FA5]+)*$/;
+        return pattern.test(value) || !value || '姓名无效';
+      },
+    ],
   }),
   methods: {
     handleClick(itemText) {
       if (itemText === '退出登录') {
-        this.$store.commit('showDialog', { value: 'Logout', style: 2, text: '确定退出当前帐号?' });
+        this.showDialog({ value: 'Logout', style: 2, text: '确定退出当前帐号?' });
       } else if (itemText === '修改密码') {
         this.showItem.password = true;
         this.showMenu = false;
@@ -146,14 +178,15 @@ export default {
       this.oldPassword = '';
       this.newPassword1 = '';
       this.newPassword2 = '';
+      this.newFullName = '';
     },
     async changePassword() {
       try {
         const { oldPassword, newPassword1: newPassword } = this;
         const { status } = (await axios.patch('/user/password', { oldPassword, newPassword })) || {};
         if (status === 200) {
-          this.$store.commit('showDialog', { value: 'ChangePasswordSuccess', style: 0, text: '修改密码成功 , 请重新登陆' });
-          this.$store.commit('userLogin', { value: false });
+          this.showDialog({ value: 'ChangePasswordSuccess', style: 0, text: '修改密码成功 , 请重新登陆' });
+          this.userLogin({ value: false });
         }
       } catch ({
         response: {
@@ -162,15 +195,40 @@ export default {
         },
       }) {
         if (status === 404 && error === 'OldPasswordError') {
-          this.$store.commit('showDialog', { value: 'ChangePasswordError', style: 1, text: '旧密码错误' });
+          this.showDialog({ value: 'ChangePasswordError', style: 1, text: '旧密码错误' });
         } else if (status === 500) {
-          this.$store.commit('showDialog', { value: 'ServerError', style: 1, text: `服务器错误 , ${error.code}` });
+          this.showDialog({ value: 'ServerError', style: 1, text: `服务器错误 , ${error.code}` });
         }
       }
       this.oldPassword = '';
       this.newPassword1 = '';
       this.newPassword2 = '';
     },
+    async changeFullName() {
+      try {
+        const { newFullName } = this;
+        const { status } = (await axios.patch('/user/full-name', { newFullName })) || {};
+        if (status === 200) {
+          this.setNewFullNameWhenChange({ fullName: this.newFullName });
+          this.showDialog({ value: 'ChangeFullNameSuccess', style: 0, text: '修改姓名成功' });
+        }
+      } catch ({
+        response: {
+          status,
+          data: { error },
+          s,
+        },
+      }) {
+        if (status === 500) {
+          this.showDialog({ value: 'ServerError', style: 1, text: `服务器错误 , ${error.code}` });
+        }
+      }
+      this.newFullName = '';
+    },
+    ...mapMutations(['showDialog', 'userLogin', 'setNewFullNameWhenChange']),
+  },
+  computed: {
+    ...mapState(['userFullName']),
   },
 };
 </script>

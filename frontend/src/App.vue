@@ -51,8 +51,11 @@ export default {
   methods: {
     closeDialog() {
       this.hideDialog();
-      if (this.dialog.value === 'LoginSuccess') {
+      const { value } = this.dialog;
+      if (value === 'LoginSuccess') {
         this.userLogin({ value: true });
+      } else if (value === 'ChangeFullNameSuccess') {
+        this.setFullName({ fullName: this.newFullNameWhenChange });
       }
     },
     confirmCloseDialog() {
@@ -69,7 +72,7 @@ export default {
     ...mapMutations(['hideDialog', 'userLogin', 'setFullName']),
   },
   computed: {
-    ...mapState(['isLogin', 'userFullName', 'dialog']),
+    ...mapState(['isLogin', 'userFullName', 'dialog', 'newFullNameWhenChange']),
   },
 };
 </script>

@@ -94,12 +94,12 @@ export default {
     registerPwd2: '',
     isRegErr: false,
     registerInviteCode: '',
-    // todo: show password complexity with vuetify text field progress
+    // 待做用户密码复杂度检测
     fullNameRules: [
       value => (value || '').length <= 20 || !value || '最多20个字符',
       value => (value || '').length >= 2 || !value || '至少2个字符',
       value => {
-        // Support Chinese names include minorities
+        // 支持中文名(包括少数民族)
         const pattern = /^[\u4E00-\u9FA5]+(·[\u4E00-\u9FA5]+)*$/;
         return pattern.test(value) || !value || '姓名无效';
       },
