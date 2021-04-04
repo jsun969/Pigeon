@@ -60,7 +60,8 @@ export default {
     },
     confirmCloseDialog() {
       this.hideDialog();
-      if (this.dialog.value === 'Logout') {
+      const { value } = this.dialog;
+      if (value === 'Logout') {
         localStorage.removeItem('userToken');
         this.userLogin({ value: false });
         this.$router.push({ name: 'Home' });

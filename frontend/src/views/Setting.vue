@@ -1,8 +1,8 @@
 <template>
-  <div class="setting" style="margin-top:30px">
+  <div class="setting" style="margin-top:28px">
     <v-btn text color="primary" v-if="!showMenu" @click="backToMenu" style="position:fixed;top:67px;left:5px;">&lt;设置</v-btn>
     <div class="menu" v-if="showMenu">
-      <v-list flat>
+      <v-list flat v-if="$vuetify.breakpoint.name == 'xs'">
         <div v-for="(item, i) in items" :key="i">
           <v-divider v-if="item.divider" :inset="item.inset"></v-divider>
           <v-list-item v-if="!item.divider" @click="handleClick(item.text)">
@@ -15,8 +15,18 @@
           </v-list-item>
         </div>
       </v-list>
+      <div v-if="$vuetify.breakpoint.name != 'xs'" style="display:flex;flex-wrap:wrap;">
+        <div v-for="(item, i) in items.filter(item => item.icon)" :key="i" style="margin:16px;">
+          <v-btn x-large @click="handleClick(item.text)" height="100">
+            <div style="display:flex;flex-direction:column;">
+              <v-icon>{{ item.icon }}</v-icon>
+              <span>{{ item.text }}</span>
+            </div>
+          </v-btn>
+        </div>
+      </div>
     </div>
-    <div class="password" v-else-if="showItem.password" style="padding:25px;">
+    <div class="password" v-else-if="showItem.password" style="padding:24px;">
       <v-container>
         <v-row>
           <v-text-field
@@ -62,12 +72,12 @@
             :block="$vuetify.breakpoint.name == 'xs'"
             :disabled="!oldPassword || !newPassword1 || !newPassword2 || isNewPwdErr"
             @click="changePassword"
-            >确定</v-btn
-          >
+            >确定
+          </v-btn>
         </v-row>
       </v-container>
     </div>
-    <div class="fullname" v-else-if="showItem.fullname" style="padding:25px;">
+    <div class="fullname" v-else-if="showItem.fullname" style="padding:24px;">
       <v-container>
         <v-row>
           <v-text-field
@@ -85,8 +95,8 @@
             :block="$vuetify.breakpoint.name == 'xs'"
             :disabled="!newFullName || newFullNameErr"
             @click="changeFullName"
-            >确定</v-btn
-          >
+            >确定
+          </v-btn>
         </v-row>
       </v-container>
     </div>
@@ -205,6 +215,7 @@ export default {
       this.newPassword2 = '';
     },
     async changeFullName() {
+      // 待做:确认是否修改姓名
       try {
         const { newFullName } = this;
         const { status } = (await axios.patch('/user/full-name', { newFullName })) || {};

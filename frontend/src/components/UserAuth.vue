@@ -94,7 +94,7 @@ export default {
     registerPwd2: '',
     isRegErr: false,
     registerInviteCode: '',
-    // 待做用户密码复杂度检测
+    // 待做:用户密码复杂度检测
     fullNameRules: [
       value => (value || '').length <= 20 || !value || '最多20个字符',
       value => (value || '').length >= 2 || !value || '至少2个字符',

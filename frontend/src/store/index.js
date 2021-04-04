@@ -13,6 +13,7 @@ export default new Vuex.Store({
       style: 0,
     },
     userFullName: null,
+    // 确定弹窗后修改前端新姓名的一个临时的全局变量 还没找到别的方法
     newFullNameWhenChange: null,
   },
   mutations: {
