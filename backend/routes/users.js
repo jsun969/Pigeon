@@ -9,8 +9,7 @@ const router = express.Router();
 const InviteCode = require('../models/inviteCode');
 const User = require('../models/user');
 
-// Generate invite codes
-// Use '?count=<Number>' to provide quantity
+// 生成邀请码 请求格式应为/?count=<个数>
 router.put('/invite-codes', async (req, res) => {
   try {
     let randStrArr = [];
@@ -32,7 +31,7 @@ router.put('/invite-codes', async (req, res) => {
   }
 });
 
-// Get all invite codes
+// 获取所有邀请码及其注册用户名
 router.get('/invite-codes', async (req, res) => {
   try {
     const docs = await InviteCode.find();
@@ -45,19 +44,22 @@ router.get('/invite-codes', async (req, res) => {
   }
 });
 
-// Register
+// 注册(屎山)
 router.post('/register', async (req, res) => {
   try {
     const nameDoc = await User.findOne({ username: req.body.username });
     if (!nameDoc) {
       const codeDoc = await InviteCode.findOne({ code: req.body.inviteCode });
       if (!codeDoc) {
+        // 邀请码错误
         console.log(`User [ ${req.body.username} ] try to register, but the invite code is wrong.`);
         res.status(404).json({ error: 'InviteCodeNotFound' });
       } else if (codeDoc.username) {
+        // 邀请码已被使用
         console.log(`User [ ${req.body.username} ] try to register, but the invite code has been used.`);
         res.status(404).json({ error: 'InviteCodeIsUsed' });
       } else {
+        // 注册成功
         await InviteCode.findOneAndUpdate({ code: req.body.inviteCode }, { username: req.body.username });
         const user = new User({
           fullName: req.body.fullName,
@@ -69,6 +71,7 @@ router.post('/register', async (req, res) => {
         res.sendStatus(201);
       }
     } else {
+      // 用户名重复
       console.log(`User [ ${req.body.username} ] has already registered.`);
       res.status(404).json({ error: 'DuplicateUsername' });
     }
@@ -78,7 +81,7 @@ router.post('/register', async (req, res) => {
   }
 });
 
-// Login
+// 登陆
 router.post('/login', async (req, res) => {
   try {
     const doc = await User.findOne({
@@ -99,19 +102,19 @@ router.post('/login', async (req, res) => {
   }
 });
 
-// Verify token of logged user
+// 验证用户的Token
 router.post('/token-verify', async (req, res) => {
   try {
     const { userId } = jwt.verify(req.body.auth, cfg.token.secret);
-    const { username } = await User.findById(userId);
+    const { username, fullName } = await User.findById(userId);
     console.log(`User [ ${username} ] login with token successfully.`);
-    res.json({ username });
+    res.json({ fullName });
   } catch (error) {
-    res.status(500).send({ error });
+    res.status(403).send({ error });
   }
 });
 
-// Change password
+// 修改密码
 router.patch('/password', async (req, res) => {
   try {
     const { userId } = jwt.verify(req.headers.auth, cfg.token.secret);
@@ -121,6 +124,7 @@ router.patch('/password', async (req, res) => {
       console.log(`User [ ${username} ] change password successfully.`);
       res.sendStatus(200);
     } else {
+      // 旧密码错误
       console.log(`User [ ${username} ] try to change password but old password is wrong.`);
       res.status(404).json({ error: 'OldPasswordError' });
     }
@@ -129,19 +133,15 @@ router.patch('/password', async (req, res) => {
     res.status(500).send({ error });
   }
 });
-// Change full name
+
+// 修改姓名
 router.patch('/full-name', async (req, res) => {
   try {
     const { userId } = jwt.verify(req.headers.auth, cfg.token.secret);
-    const { fullName: oldFullName, username } = await User.findById(userId);
-    if (oldFullName === req.body.oldFullName) {
-      await User.findByIdAndUpdate(userId, { fullName: req.body.newFullName });
-      console.log(`User [ ${username} ] change full name successfully.`);
-      res.sendStatus(200);
-    } else {
-      console.log(`User [ ${username} ] try to change full name but old full name is wrong.`);
-      res.status(404).json({ error: 'OldFullNameError' });
-    }
+    await User.findByIdAndUpdate(userId, { fullName: req.body.newFullName });
+    const { username } = await User.findById(userId);
+    console.log(`User [ ${username} ] change full name successfully.`);
+    res.sendStatus(200);
   } catch (error) {
     console.error(error);
     res.status(500).send({ error });
