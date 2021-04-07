@@ -16,8 +16,10 @@ app.use(cors());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-const userRoutes = require("./routes/users.js");
+const userRoutes = require("./routes/user.js");
+const deviceRoutes = require("./routes/device.js");
 app.use("/user", userRoutes);
+app.use("/device", deviceRoutes);
 
 mongoose.connect(
   cfg.db.username === ""

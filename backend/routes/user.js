@@ -120,7 +120,9 @@ router.patch('/password', async (req, res) => {
     const { userId } = jwt.verify(req.headers.auth, cfg.token.secret);
     const { password: oldPassword, username } = await User.findById(userId);
     if (oldPassword === crypto.createHash('sha256').update(req.body.oldPassword).digest('hex')) {
-      await User.findByIdAndUpdate(userId, { password: crypto.createHash('sha256').update(req.body.newPassword).digest('hex') });
+      await User.findByIdAndUpdate(userId, {
+        password: crypto.createHash('sha256').update(req.body.newPassword).digest('hex'),
+      });
       console.log(`User [ ${username} ] change password successfully.`);
       res.sendStatus(200);
     } else {
