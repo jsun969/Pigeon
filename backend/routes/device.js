@@ -9,21 +9,29 @@ const Device = require('../models/device');
 
 router.post('/code', async (req, res) => {
   try {
-    let isCodeDuplicate, code;
-    do {
-      // 生成一个六位设备代码
-      code = Math.floor(100000 + Math.random() * 900000);
-      // 判断生成的设备代码是否重复
-      isCodeDuplicate = await Device.findOne({ code });
-    } while (isCodeDuplicate);
-    const device = new Device({
-      // 将客户端MAC地址+硬盘标识符生成的id加密
-      _id: crypto.createHash('sha256').update(req.body.pcID).digest('hex'),
-      code,
-    });
-    const deviceRes = await device.save();
-    res.json({ code });
-    console.log(`Device [ ${deviceRes.code} ] register successfully!`);
+    // 判断设备是否已注册
+    const isPcIdDuplicate = await Device.findById(crypto.createHash('sha256').update(req.body.pcID).digest('hex'));
+    if (isPcIdDuplicate) {
+      res.json({ code: isPcIdDuplicate.code });
+      console.log(`Device [ ${isPcIdDuplicate.code} ] open the client`);
+    } else {
+      // 创建新设备
+      let isCodeDuplicate, code;
+      do {
+        // 生成一个六位设备代码
+        code = Math.floor(100000 + Math.random() * 900000);
+        // 判断生成的设备代码是否重复
+        isCodeDuplicate = await Device.findOne({ code });
+      } while (isCodeDuplicate);
+      const device = new Device({
+        // 将客户端MAC地址+硬盘标识符生成的pcID加密
+        _id: crypto.createHash('sha256').update(req.body.pcID).digest('hex'),
+        code,
+      });
+      const deviceRes = await device.save();
+      res.json({ code });
+      console.log(`Device [ ${deviceRes.code} ] register successfully!`);
+    }
   } catch (error) {
     console.error(error);
     res.status(500).send({ error });
