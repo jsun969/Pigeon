@@ -15,6 +15,11 @@ export default new Vuex.Store({
     userFullName: null,
     // 确定弹窗后修改前端新姓名的一个临时的全局变量 还没找到别的方法
     newFullNameWhenChange: null,
+    devices: [
+      { code: 114514, name: '初三16班', status: 0, editing: false, editingName: '' },
+      { code: 458962, name: '初一99班', status: 1, editing: false, editingName: '' },
+      { code: 898919, name: '不知道几班', status: 2, editing: false, editingName: '' },
+    ],
   },
   mutations: {
     userLogin(state, payload) {
@@ -34,6 +39,21 @@ export default new Vuex.Store({
     },
     setNewFullNameWhenChange(state, payload) {
       state.newFullNameWhenChange = payload.fullName;
+    },
+    setDeviceName(state, payload) {
+      state.devices[payload.index].name = payload.newName;
+    },
+    startEditing(state, payload) {
+      state.devices[payload.index].editing = true;
+      state.devices[payload.index].editingName = state.devices[payload.index].name;
+    },
+    stopEditing(state, payload) {
+      state.devices[payload.index].editing = false;
+    },
+  },
+  getters: {
+    onlineDevicesName: state => {
+      return state.devices.filter(({ status }) => status === 0).map(({ name }) => name);
     },
   },
   actions: {},

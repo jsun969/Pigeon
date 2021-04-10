@@ -5,8 +5,8 @@
         <v-autocomplete
           chips
           deletable-chips
-          v-model="selectClass"
-          :items="totClass"
+          v-model="selectDevice"
+          :items="onlineDevicesName"
           label="班级"
           no-data-text="无符合班级"
           multiple
@@ -19,12 +19,16 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex';
+
 export default {
   name: 'Home',
   data: () => ({
-    selectClass: ['高一5班', '初三16班'],
-    totClass: ['高一5班', '初三16班', '初二24班', '高二8班', '高三20班', '初一15班', '初二75班', '高二97班', '高三19班', '初一97班'],
+    selectDevice: [],
     mainText: '',
   }),
+  computed: {
+    ...mapGetters(['onlineDevicesName']),
+  },
 };
 </script>

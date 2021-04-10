@@ -1,7 +1,10 @@
 <template>
   <v-dialog v-model="showDialog" width="300">
     <v-card>
-      <v-card-title :class="{ headline: true, success: titleStyle === 0, error: titleStyle === 1, warning: titleStyle === 2 }" style="color: white">
+      <v-card-title
+        :class="{ headline: true, success: titleStyle === 0, error: titleStyle === 1, warning: titleStyle === 2 }"
+        style="color: white"
+      >
         {{ ['成功', '失败', '警告'][titleStyle] }}
       </v-card-title>
 
