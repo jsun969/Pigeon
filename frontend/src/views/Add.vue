@@ -1,15 +1,15 @@
 <template>
   <div class="add">
     <v-container>
-      <v-row style="margin-bottom:-32px">
+      <v-row style="margin:4px 0px -36px">
         <v-col>
-          <v-text-field label="设备代码"></v-text-field>
+          <v-text-field v-model="newCode" label="设备代码" :rules="codeRules" outlined></v-text-field>
         </v-col>
         <v-col>
-          <v-text-field label="备注名"></v-text-field>
+          <v-text-field v-model="newName" label="备注名" outlined></v-text-field>
         </v-col>
       </v-row>
-      <v-row>
+      <v-row style="padding:0px 8px 0px 8px">
         <v-col>
           <v-btn block large color="primary">添加</v-btn>
         </v-col>
@@ -53,6 +53,18 @@ import { mapState, mapMutations } from 'vuex';
 
 export default {
   name: 'Add',
+  data: () => ({
+    newCode: '',
+    newName: '',
+    codeRules: [
+      value => (value || '').length <= 6 || !value || '最多6个字符',
+      value => (value || '').length >= 6 || !value || '至少6个字符',
+      value => {
+        const pattern = /^\d{1,}$/;
+        return pattern.test(value) || !value || '设备代码应为纯数字';
+      },
+    ],
+  }),
   methods: {
     confirmEdit(item, index) {
       this.setDeviceName({ index, newName: item.editingName });
