@@ -63,7 +63,13 @@
               </v-btn>
               <v-btn icon color="red" :disabled="item.status === 2" v-if="!item.editing"><v-icon>mdi-delete</v-icon></v-btn>
               <v-btn icon color="red" v-if="item.editing" @click="stopEditing({ index })"><v-icon>mdi-close</v-icon></v-btn>
-              <v-btn icon color="green" v-if="item.editing" @click="confirmEdit(item, index)" :disabled="isEditingError">
+              <v-btn
+                icon
+                color="green"
+                v-if="item.editing"
+                @click="confirmEdit(item, index)"
+                :disabled="isEditingError || item.editingName === item.name"
+              >
                 <v-icon>mdi-check</v-icon>
               </v-btn>
             </td>
