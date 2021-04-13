@@ -11,7 +11,7 @@
           no-data-text="无符合班级"
           multiple
         ></v-autocomplete>
-        <v-textarea outlined no-resize rows="5" name="input-7-4" label="信息" v-model="mainText"></v-textarea>
+        <v-textarea outlined no-resize rows="5" label="信息" v-model="mainText"></v-textarea>
         <v-btn color="primary" elevation="2" large :block="$vuetify.breakpoint.name == 'xs'">发送</v-btn>
       </div>
     </v-row>

@@ -50,6 +50,10 @@ export default new Vuex.Store({
     stopEditing(state, payload) {
       state.devices[payload.index].editing = false;
     },
+    addDevice(state, payload) {
+      const { code, name } = payload;
+      state.devices.unshift({ code, name, status: 2, editing: false, editingName: '' });
+    },
   },
   getters: {
     onlineDevicesName: state => {

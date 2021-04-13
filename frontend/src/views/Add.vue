@@ -23,7 +23,9 @@
       </v-row>
       <v-row style="padding:0px 8px 0px 8px">
         <v-col>
-          <v-btn block large color="primary" :disabled="isAddingErr || !newName || !newCode">添加</v-btn>
+          <v-btn block large color="primary" :disabled="isAddingErr || !newName || !newCode" @click="addNewDevice()"
+            >添加</v-btn
+          >
         </v-col>
       </v-row>
     </v-container>
@@ -105,7 +107,12 @@ export default {
       this.stopEditing({ index });
       //缺少:后端请求代码
     },
-    ...mapMutations(['setDeviceName', 'startEditing', 'stopEditing']),
+    addNewDevice() {
+      this.addDevice({ code: this.newCode, name: this.newName });
+      this.newCode = '';
+      this.newName = '';
+    },
+    ...mapMutations(['setDeviceName', 'startEditing', 'stopEditing', 'addDevice']),
   },
   computed: {
     ...mapState(['devices']),
