@@ -12,7 +12,7 @@ router.get('/code', async (req, res) => {
     // 判断设备是否已注册
     const isPcIdDuplicate = await Device.findById(crypto.createHash('sha256').update(req.query.pcID).digest('hex'));
     if (isPcIdDuplicate) {
-      res.send(`${isPcIdDuplicate.code}`);
+      res.json({ code: isPcIdDuplicate.code });
       console.log(`Device [ ${isPcIdDuplicate.code} ] open the client`);
     } else {
       // 创建新设备
@@ -29,7 +29,7 @@ router.get('/code', async (req, res) => {
         code,
       });
       const deviceRes = await device.save();
-      res.send(`${code}`);
+      res.json({ code });
       console.log(`Device [ ${deviceRes.code} ] register successfully!`);
     }
   } catch (error) {
@@ -37,5 +37,7 @@ router.get('/code', async (req, res) => {
     res.sendStatus(500);
   }
 });
+
+router.post('/add', async (req, res) => {});
 
 module.exports = router;
