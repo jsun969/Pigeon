@@ -106,6 +106,9 @@
     <div class="theme" v-else-if="showItem.theme">
       <h1>切换主题</h1>
     </div>
+    <div class="about" v-else-if="showItem.about">
+      <h1>关于项目</h1>
+    </div>
   </div>
 </template>
 
@@ -118,6 +121,8 @@ export default {
   data: () => ({
     items: [
       { divider: true, inset: false },
+      { icon: 'mdi-information', text: '关于项目' },
+      { divider: true, inset: true },
       { icon: 'mdi-form-textbox-password', text: '修改密码' },
       { divider: true, inset: true },
       { icon: 'mdi-badge-account-horizontal', text: '修改姓名' },
@@ -131,6 +136,7 @@ export default {
     ],
     showMenu: true,
     showItem: {
+      about: false,
       password: false,
       fullname: false,
       messageStyle: false,
@@ -177,6 +183,9 @@ export default {
         this.showMenu = false;
       } else if (itemText === '切换主题') {
         this.showItem.theme = true;
+        this.showMenu = false;
+      } else if (itemText === '关于项目') {
+        this.showItem.about = true;
         this.showMenu = false;
       }
     },
