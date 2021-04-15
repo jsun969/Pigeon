@@ -111,6 +111,7 @@ export default {
       this.addDevice({ code: this.newCode, name: this.newName });
       this.newCode = '';
       this.newName = '';
+      //缺少:后端请求代码
     },
     ...mapMutations(['setDeviceName', 'startEditing', 'stopEditing', 'addDevice']),
   },

@@ -1,6 +1,6 @@
 <template>
-  <v-container fill-height fluid>
-    <v-row align="center" justify="center" class="d-flex flex-column">
+  <v-container>
+    <v-row align="center" justify="center" style="margin-top:8vh">
       <div style="width:80vw">
         <v-autocomplete
           chips
