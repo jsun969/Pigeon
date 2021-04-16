@@ -14,9 +14,13 @@ router.put('/invite-codes', async (req, res) => {
   try {
     let randStrArr = [];
     for (let i = 0; i < req.query.count; i++) {
-      const randStr = crypto.randomBytes(20).toString('hex');
+      let isInviteCodeDuplicate, randStr;
+      do {
+        randStr = crypto.randomBytes(20).toString('hex');
+        isInviteCodeDuplicate = await InviteCode.findById(randStr);
+      } while (isInviteCodeDuplicate);
       const inviteCode = new InviteCode({
-        code: randStr,
+        _id: randStr,
         username: null,
       });
       await inviteCode.save();
@@ -35,7 +39,7 @@ router.put('/invite-codes', async (req, res) => {
 router.get('/invite-codes', async (req, res) => {
   try {
     const docs = await InviteCode.find();
-    const docsArr = docs.map(({ code, username }) => ({ code, username }));
+    const docsArr = docs.map(({ _id: code, username }) => ({ code, username }));
     res.json(docsArr);
     console.log('Get all invite codes successfully!');
   } catch (error) {
@@ -49,7 +53,7 @@ router.post('/register', async (req, res) => {
   try {
     const nameDoc = await User.findOne({ username: req.body.username });
     if (!nameDoc) {
-      const codeDoc = await InviteCode.findOne({ code: req.body.inviteCode });
+      const codeDoc = await InviteCode.findById(req.body.inviteCode);
       if (!codeDoc) {
         // 邀请码错误
         res.status(404).json({ error: 'InviteCodeNotFound' });
@@ -60,7 +64,7 @@ router.post('/register', async (req, res) => {
         console.log(`User [ ${req.body.username} ] try to register, but the invite code has been used.`);
       } else {
         // 注册成功
-        await InviteCode.findOneAndUpdate({ code: req.body.inviteCode }, { username: req.body.username });
+        await InviteCode.findByIdAndUpdate(req.body.inviteCode, { username: req.body.username });
         const user = new User({
           fullName: req.body.fullName,
           username: req.body.username,
