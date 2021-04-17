@@ -101,6 +101,11 @@ export default {
     ],
     isEditingError: false,
   }),
+  sockets: {
+    connect() {
+      console.log(this.$socket.id);
+    },
+  },
   methods: {
     confirmEdit(item, index) {
       this.setDeviceName({ index, newName: item.editingName });
@@ -108,10 +113,10 @@ export default {
       //缺少:后端请求代码
     },
     addNewDevice() {
-      this.addDevice({ code: this.newCode, name: this.newName });
+      this.addDevice({ code: +this.newCode, name: this.newName });
+      this.$socket.emit('addDevice', { auth: localStorage.getItem('userToken'), code: +this.newCode });
       this.newCode = '';
       this.newName = '';
-      //缺少:后端请求代码
     },
     ...mapMutations(['setDeviceName', 'startEditing', 'stopEditing', 'addDevice']),
   },
