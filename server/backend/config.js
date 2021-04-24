@@ -1,7 +1,7 @@
 module.exports = {
   app: {
     port: 3000,
-    origins: ["http://localhost:8080"],
+    origins: ["*"],
   },
   db: {
     username: '',

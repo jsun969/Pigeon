@@ -7,15 +7,7 @@ const jwt = require('jsonwebtoken');
 const app = express();
 const port = cfg.app.port;
 
-const whitelist = cfg.app.origins;
-const corsOptions = {
-  credentials: true,
-  origin: (origin, callback) => {
-    if (whitelist.includes(origin)) return callback(null, true);
-    else callback(new Error('Not allowed by CORS'));
-  },
-};
-app.use(cors(corsOptions));
+app.use(cors());
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
@@ -49,12 +41,12 @@ const io = require('socket.io')(server, {
 });
 
 io.on('connection', socket => {
-  console.log(`User[ ${socket.id} ] connect`);
+  console.log(`User [ ${socket.id} ] connect`);
   // 添加设备请求
   socket.on('addDevice', async ({ auth, code }) => {
     const { userId } = jwt.verify(auth, cfg.token.secret);
     const { fullName, username } = await User.findById(userId);
     console.log(`User [ ${username} ] want to connect Device [ ${code} ]`);
-    // socket.emit('askDeviceAdd', { user, code });
+    socket.emit('askDeviceAdd', { fullName, username, code });
   });
 });
