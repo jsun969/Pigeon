@@ -1,32 +1,28 @@
 <template>
   <div id="app">
-    <div id="nav">
-      <router-link to="/">Home</router-link> |
-      <router-link to="/about">About</router-link>
-    </div>
-    <router-view/>
+    <nav id="top-nav">
+      <router-link v-for="(item, index) in navigation" :key="index" :to="item.to">{{ item.name }}</router-link>
+    </nav>
+    <router-view />
   </div>
 </template>
 
+<script>
+export default {
+  data: () => ({
+    navigation: [
+      { name: '设置', to: '/' },
+      { name: '历史', to: '/about' },
+      { name: '用户', to: '/about' },
+    ],
+  }),
+};
+</script>
+
 <style lang="scss">
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-}
-
-#nav {
-  padding: 30px;
-
-  a {
-    font-weight: bold;
-    color: #2c3e50;
-
-    &.router-link-exact-active {
-      color: #42b983;
-    }
-  }
+#top-nav {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
 }
 </style>
