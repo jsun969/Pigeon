@@ -1,31 +1,44 @@
 <template>
   <v-app>
-    <v-system-bar window fixed color="primary" dark style="-webkit-app-region: drag">
-      <span>飞鸽传书</span>
-      <v-spacer></v-spacer>
-      <v-icon style="-webkit-app-region: no-drag;" @click="minimize">mdi-minus</v-icon>
-      <v-icon style="-webkit-app-region: no-drag;" @click="close">mdi-close</v-icon>
-    </v-system-bar>
-    <v-main style="margin-top:32px">
-      <v-tabs grow v-model="tabs">
-        <v-tab>软件设置</v-tab>
-        <v-tab>历史记录</v-tab>
-        <v-tab>已绑教师</v-tab>
-      </v-tabs>
-      <v-container>
-        <v-tabs-items v-model="tabs">
-          <v-tab-item>lol</v-tab-item>
-          <v-tab-item>olo</v-tab-item>
-          <v-tab-item>llooll</v-tab-item>
-        </v-tabs-items>
-      </v-container>
+    <v-main>
+      <v-toolbar color="primary" dark flat style="-webkit-app-region: drag">
+        <v-toolbar-title>飞鸽传书</v-toolbar-title>
+        <v-spacer></v-spacer>
+        <v-btn icon style="-webkit-app-region: no-drag;" @click="minimize">
+          <v-icon>mdi-minus</v-icon>
+        </v-btn>
+        <v-btn icon style="-webkit-app-region: no-drag;" @click="close">
+          <v-icon>mdi-close</v-icon>
+        </v-btn>
+        <template v-slot:extension>
+          <v-tabs grow v-model="tabs" style="-webkit-app-region: no-drag;">
+            <v-tab>软件设置</v-tab>
+            <v-tab>历史记录</v-tab>
+            <v-tab>已绑教师</v-tab>
+          </v-tabs>
+        </template>
+      </v-toolbar>
+      <v-tabs-items v-model="tabs">
+        <v-tab-item><Settings /></v-tab-item>
+        <v-tab-item><History /></v-tab-item>
+        <v-tab-item><Users /></v-tab-item>
+      </v-tabs-items>
     </v-main>
   </v-app>
 </template>
 
 <script>
+import Settings from './components/Settings.vue';
+import History from './components/History.vue';
+import Users from './components/Users.vue';
+
 export default {
   name: 'App',
+  components: {
+    Settings,
+    History,
+    Users,
+  },
   data: () => ({
     tabs: 0,
   }),
