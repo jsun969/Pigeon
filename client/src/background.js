@@ -1,8 +1,10 @@
 'use strict';
 
-import { app, protocol, BrowserWindow } from 'electron';
+import { app, protocol, BrowserWindow, ipcMain } from 'electron';
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib';
 import installExtension, { VUEJS_DEVTOOLS } from 'electron-devtools-installer';
+import { machineId } from 'node-machine-id';
+
 const isDevelopment = process.env.NODE_ENV !== 'production';
 
 // Scheme must be registered before the app is ready
@@ -11,8 +13,8 @@ protocol.registerSchemesAsPrivileged([{ scheme: 'app', privileges: { secure: tru
 async function createWindow() {
   // Create the browser window.
   const win = new BrowserWindow({
-    width: 300,
-    height: 400,
+    width: 500,
+    height: 550,
     resizable: false,
     frame: false,
     webPreferences: {
@@ -61,6 +63,10 @@ app.on('ready', async () => {
     }
   }
   createWindow();
+  // 发送设备代码
+  ipcMain.on('getPcId', async (event, arg) => {
+    event.returnValue = await machineId();
+  });
 });
 
 // Exit cleanly on request from parent process in development mode.

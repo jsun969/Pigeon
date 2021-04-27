@@ -1,10 +1,59 @@
 <template>
   <v-container>
-    lol
+    <v-row>
+      <v-col cols="12">
+        <v-card>
+          <v-card-title>设备代码</v-card-title>
+          <v-card-text class="display-4">
+            {{ code }}
+          </v-card-text>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn rounded outlined text> 刷新 <v-icon dark> mdi-reload </v-icon> </v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-col>
+      <v-col cols="4">
+        <v-card>
+          <v-card-title>未读消息</v-card-title>
+          <v-card-text>
+            <span class="display-2">99</span>
+            <span class="title">条</span>
+          </v-card-text>
+        </v-card>
+      </v-col>
+      <v-col cols="8">
+        <v-card>
+          <v-card-title>空</v-card-title>
+          <v-card-text>
+            还不知道写点啥
+          </v-card-text>
+        </v-card>
+      </v-col>
+    </v-row>
   </v-container>
 </template>
 <script>
+import axios from 'axios';
+import { ipcRenderer } from 'electron';
+
 export default {
   name: 'Settings',
+  async created() {
+    try {
+      const {
+        status,
+        data: { code },
+      } = (await axios.get('/device/code', { params: { pcId: ipcRenderer.sendSync('getPcId') } })) || {};
+      if (status === 200) {
+        this.code = code;
+      }
+    } catch {
+      this.code = '网络错误';
+    }
+  },
+  data: () => ({
+    code: null,
+  }),
 };
 </script>
