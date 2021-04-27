@@ -13,8 +13,8 @@ protocol.registerSchemesAsPrivileged([{ scheme: 'app', privileges: { secure: tru
 async function createWindow() {
   // Create the browser window.
   const win = new BrowserWindow({
-    width: 500,
-    height: 550,
+    width: 450,
+    height: 520,
     resizable: false,
     frame: false,
     webPreferences: {

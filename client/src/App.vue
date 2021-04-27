@@ -3,6 +3,9 @@
     <v-app-bar color="primary" dark flat fixed style="-webkit-app-region: drag">
       <v-toolbar-title>飞鸽传书</v-toolbar-title>
       <v-spacer></v-spacer>
+      <v-btn icon style="-webkit-app-region: no-drag;" @click="github">
+        <v-icon>mdi-github</v-icon>
+      </v-btn>
       <v-btn icon style="-webkit-app-region: no-drag;" @click="minimize">
         <v-icon>mdi-minus</v-icon>
       </v-btn>
@@ -31,7 +34,7 @@
 import Status from './components/Status.vue';
 import History from './components/History.vue';
 import Users from './components/Users.vue';
-import { remote } from 'electron';
+import { remote, shell } from 'electron';
 
 export default {
   name: 'App',
@@ -45,17 +48,22 @@ export default {
   }),
   methods: {
     minimize() {
-      console.log('minimize');
       remote.getCurrentWindow().minimize();
     },
     close() {
       console.log('close');
+    },
+    github() {
+      shell.openExternal('https://github.com/jsun969/Pigeon');
     },
   },
 };
 </script>
 
 <style lang="scss">
+* {
+  user-select: none;
+}
 ::-webkit-scrollbar {
   display: none;
 }
