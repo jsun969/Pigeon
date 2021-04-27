@@ -38,7 +38,7 @@ import axios from 'axios';
 import { ipcRenderer } from 'electron';
 
 export default {
-  name: 'Settings',
+  name: 'Status',
   async created() {
     try {
       const {

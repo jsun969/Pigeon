@@ -19,7 +19,7 @@
     </v-app-bar>
     <v-main style="margin-top:104px">
       <v-tabs-items v-model="tabs">
-        <v-tab-item><Settings /></v-tab-item>
+        <v-tab-item><Status /></v-tab-item>
         <v-tab-item><History /></v-tab-item>
         <v-tab-item><Users /></v-tab-item>
       </v-tabs-items>
@@ -28,14 +28,15 @@
 </template>
 
 <script>
-import Settings from './components/Settings.vue';
+import Status from './components/Status.vue';
 import History from './components/History.vue';
 import Users from './components/Users.vue';
+import { remote } from 'electron';
 
 export default {
   name: 'App',
   components: {
-    Settings,
+    Status,
     History,
     Users,
   },
@@ -45,6 +46,7 @@ export default {
   methods: {
     minimize() {
       console.log('minimize');
+      remote.getCurrentWindow().minimize();
     },
     close() {
       console.log('close');
