@@ -16,7 +16,7 @@
         <v-tabs grow v-model="tabs" style="-webkit-app-region: no-drag;">
           <v-tab>软件状态</v-tab>
           <v-tab>历史记录</v-tab>
-          <v-tab>已绑教师</v-tab>
+          <v-tab>绑定教师</v-tab>
         </v-tabs>
       </template>
     </v-app-bar>
