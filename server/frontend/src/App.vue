@@ -33,7 +33,6 @@ export default {
     Dialog,
   },
   async created() {
-    axios.defaults.baseURL = 'http://localhost:3000';
     try {
       const {
         status,

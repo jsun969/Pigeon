@@ -46,7 +46,7 @@ io.on('connection', socket => {
   socket.on('addDevice', async ({ auth, code }) => {
     const { userId } = jwt.verify(auth, cfg.token.secret);
     const { fullName, username } = await User.findById(userId);
+    io.sockets.emit('askDeviceAdd', { fullName, username, code });
     console.log(`User [ ${username} ] want to connect Device [ ${code} ]`);
-    socket.emit('askDeviceAdd', { fullName, username, code });
   });
 });

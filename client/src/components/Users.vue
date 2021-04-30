@@ -1,6 +1,5 @@
 <template>
   <v-container>
-    <v-btn color="pink" dark @click="showSnackbar">SNACKBAR TEST</v-btn>
     <v-chip v-for="(item, index) in users" :key="index" close style="margin:8px" @click:close="remove(index)">
       {{ item }}
     </v-chip>
@@ -40,11 +39,9 @@ export default {
     lastTimes: 30,
     timer: null,
   }),
-  methods: {
-    remove(index) {
-      this.users.splice(index, 1);
-    },
-    showSnackbar() {
+  sockets: {
+    askDeviceAdd({ fullName }) {
+      this.newUser = fullName;
       this.snackbar = true;
       this.lastTimes = 30;
       const countdown = () => {
@@ -58,6 +55,11 @@ export default {
         }, 1000);
       };
       countdown();
+    },
+  },
+  methods: {
+    remove(index) {
+      this.users.splice(index, 1);
     },
     accept() {
       clearTimeout(this.timer);

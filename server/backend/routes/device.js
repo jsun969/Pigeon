@@ -10,7 +10,7 @@ const Device = require('../models/device');
 router.get('/code', async (req, res) => {
   try {
     // 判断设备是否已注册
-    const isPcIdDuplicate = await Device.findById(crypto.createHash('sha256').update(req.query.pcID).digest('hex'));
+    const isPcIdDuplicate = await Device.findById(crypto.createHash('sha256').update(req.query.pcId).digest('hex'));
     if (isPcIdDuplicate) {
       res.json({ code: isPcIdDuplicate.code });
       console.log(`Device [ ${isPcIdDuplicate.code} ] open the client`);
@@ -25,7 +25,7 @@ router.get('/code', async (req, res) => {
       } while (isCodeDuplicate);
       const device = new Device({
         // 将客户端MAC地址+硬盘标识符生成的pcID加密
-        _id: crypto.createHash('sha256').update(req.query.pcID).digest('hex'),
+        _id: crypto.createHash('sha256').update(req.query.pcId).digest('hex'),
         code,
       });
       const deviceRes = await device.save();

@@ -15,7 +15,9 @@
   "dependencies": {
     "core-js": "^3.6.5",
     "node-machine-id": "^1.1.12",
+    "socket.io-client": "^4.0.1",
     "vue": "^2.6.11",
+    "vue-socket.io-extended": "^4.2.0",
     "vuetify": "^2.4.0",
     "vuex": "^3.4.0"
   },

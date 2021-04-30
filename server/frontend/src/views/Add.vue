@@ -101,11 +101,6 @@ export default {
     ],
     isEditingError: false,
   }),
-  sockets: {
-    connect() {
-      console.log('Socket connected!!');
-    },
-  },
   methods: {
     confirmEdit(item, index) {
       this.setDeviceName({ index, newName: item.editingName });
@@ -114,7 +109,7 @@ export default {
     },
     addNewDevice() {
       this.addDevice({ code: +this.newCode, name: this.newName });
-      this.$socket.emit('addDevice', { auth: localStorage.getItem('userToken'), code: +this.newCode });
+      this.$socket.client.emit('addDevice', { auth: localStorage.getItem('userToken'), code: +this.newCode });
       this.newCode = '';
       this.newName = '';
     },

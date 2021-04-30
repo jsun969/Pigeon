@@ -39,7 +39,7 @@ import { ipcRenderer } from 'electron';
 
 export default {
   name: 'Status',
-  async created() {
+  async mounted() {
     try {
       const {
         status,
