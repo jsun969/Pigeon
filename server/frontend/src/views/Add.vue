@@ -96,11 +96,18 @@ export default {
       value => (value || '').length >= 6 || !value || '至少6个字符',
       value => {
         const pattern = /^\d{1,}$/;
-        return pattern.test(value) || !value || '设备代码应为纯数字';
+        return pattern.test(value) || !value || '应为纯数字';
       },
     ],
     isEditingError: false,
   }),
+  sockets: {
+    askDeviceRes({ result, code }) {
+      if(result){
+        
+      }
+    },
+  },
   methods: {
     confirmEdit(item, index) {
       this.setDeviceName({ index, newName: item.editingName });

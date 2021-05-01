@@ -34,26 +34,12 @@
   </v-container>
 </template>
 <script>
-import axios from 'axios';
-import { ipcRenderer } from 'electron';
+import { mapState } from 'vuex';
 
 export default {
   name: 'Status',
-  async mounted() {
-    try {
-      const {
-        status,
-        data: { code },
-      } = (await axios.get('/device/code', { params: { pcId: ipcRenderer.sendSync('getPcId') } })) || {};
-      if (status === 200) {
-        this.code = code;
-      }
-    } catch {
-      this.code = '网络错误';
-    }
+  computed: {
+    ...mapState(['code']),
   },
-  data: () => ({
-    code: null,
-  }),
 };
 </script>

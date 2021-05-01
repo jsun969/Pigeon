@@ -47,6 +47,11 @@ export default {
       return;
     }
   },
+  sockets: {
+    connect() {
+      this.$socket.client.emit('newUserCreated', { auth: localStorage.getItem('userToken') });
+    },
+  },
   methods: {
     closeDialog() {
       this.hideDialog();

@@ -41,12 +41,27 @@ const io = require('socket.io')(server, {
 });
 
 io.on('connection', socket => {
-  console.log(`User [ ${socket.id} ] connect`);
-  // 添加设备请求
+  console.log(`[ ${socket.id} ] connect`);
+  // 设备上线
+  socket.on('newDeviceCreated', ({ code }) => {
+    socket.join(`${code}`);
+    console.log(`Device [ ${socket.id} ] created with code [ ${code} ]`);
+  });
+  // 用户上线
+  socket.on('newUserCreated', ({ auth }) => {
+    socket.join(`${auth}`);
+    console.log(`User [ ${socket.id} ] created with auth [ ${auth} ]`);
+  });
+  // 添加新设备
   socket.on('addDevice', async ({ auth, code }) => {
     const { userId } = jwt.verify(auth, cfg.token.secret);
     const { fullName, username } = await User.findById(userId);
-    io.sockets.emit('askDeviceAdd', { fullName, username, code });
+    // 给指定设备发送请求
+    socket.to(`${code}`).emit('deviceAddReq', { fullName, auth });
     console.log(`User [ ${username} ] want to connect Device [ ${code} ]`);
+  });
+  // 新设备是否同意被添加
+  socket.on('allowAddDevice', ({ result, code, userAuth }) => {
+    socket.to(`${userAuth}`).emit('askDeviceRes', { result, code });
   });
 });

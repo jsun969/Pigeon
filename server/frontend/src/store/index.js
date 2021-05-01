@@ -54,6 +54,9 @@ export default new Vuex.Store({
       const { code, name } = payload;
       state.devices.unshift({ code, name, status: 2, editing: false, editingName: '' });
     },
+    removeDevice(state, payload) {
+      state.devices
+    },
   },
   getters: {
     onlineDevicesName: state => {

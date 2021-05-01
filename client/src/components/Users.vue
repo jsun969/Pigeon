@@ -18,6 +18,8 @@
 </template>
 
 <script>
+import { mapState } from 'vuex';
+
 export default {
   name: 'Users',
   data: () => ({
@@ -35,13 +37,15 @@ export default {
       'Alma Miles',
     ],
     snackbar: false,
-    newUser: 'Caroline Davis',
+    newUser: null,
+    newUserAuth: null,
     lastTimes: 30,
     timer: null,
   }),
   sockets: {
-    askDeviceAdd({ fullName }) {
+    deviceAddReq({ fullName, auth }) {
       this.newUser = fullName;
+      this.newUserAuth = auth;
       this.snackbar = true;
       this.lastTimes = 30;
       const countdown = () => {
@@ -50,6 +54,8 @@ export default {
             this.lastTimes--;
             countdown();
           } else {
+            // 超时则拒绝添加用户
+            this.$socket.client.emit('allowAddDevice', { result: false, auth });
             clearTimeout(this.timer);
           }
         }, 1000);
@@ -64,8 +70,12 @@ export default {
     accept() {
       clearTimeout(this.timer);
       this.snackbar = false;
+      this.$socket.client.emit('allowAddDevice', { result: true, code: this.code, userAuth: this.newUserAuth });
       this.users.push(this.newUser);
     },
+  },
+  computed: {
+    ...mapState(['code']),
   },
 };
 </script>

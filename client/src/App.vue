@@ -35,6 +35,7 @@ import Status from './components/Status.vue';
 import History from './components/History.vue';
 import Users from './components/Users.vue';
 import { remote, shell } from 'electron';
+import { mapState, mapActions } from 'vuex';
 
 export default {
   name: 'App',
@@ -43,9 +44,17 @@ export default {
     History,
     Users,
   },
+  mounted() {
+    this.getCode();
+  },
   data: () => ({
     tabs: 0,
   }),
+  sockets: {
+    connect() {
+      this.$socket.client.emit('newDeviceCreated', { code: this.code });
+    },
+  },
   methods: {
     minimize() {
       remote.getCurrentWindow().minimize();
@@ -56,7 +65,9 @@ export default {
     github() {
       shell.openExternal('https://github.com/jsun969/Pigeon');
     },
+    ...mapActions(['getCode']),
   },
+  computed: { ...mapState(['code']) },
 };
 </script>
 
