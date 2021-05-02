@@ -42,13 +42,15 @@ export default {
     snackbar: false,
     newUser: null,
     newUserAuth: null,
+    newRemarkName: null,
     lastTimes: 30,
     timer: null,
   }),
   sockets: {
-    deviceAddReq({ fullName, auth }) {
+    deviceAddReq({ fullName, remarkName, auth }) {
       this.newUser = fullName;
       this.newUserAuth = auth;
+      this.newRemarkName = remarkName;
       this.snackbar = true;
       this.lastTimes = 30;
       const countdown = () => {
@@ -71,13 +73,23 @@ export default {
     accept() {
       clearTimeout(this.timer);
       this.snackbar = false;
-      this.$socket.client.emit('allowAddDevice', { result: true, code: this.code, userAuth: this.newUserAuth });
+      this.$socket.client.emit('allowAddDevice', {
+        result: true,
+        code: this.code,
+        remarkName: this.newRemarkName,
+        userAuth: this.newUserAuth,
+      });
       this.users.push(this.newUser);
     },
     refuse() {
       clearTimeout(this.timer);
       this.snackbar = false;
-      this.$socket.client.emit('allowAddDevice', { result: false, code: this.code, userAuth: this.newUserAuth });
+      this.$socket.client.emit('allowAddDevice', {
+        result: false,
+        code: this.code,
+        remarkName: this.newRemarkName,
+        userAuth: this.newUserAuth,
+      });
     },
   },
   computed: {

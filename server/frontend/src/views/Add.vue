@@ -126,7 +126,11 @@ export default {
     },
     add() {
       this.addDevice({ code: +this.newCode, name: this.newName });
-      this.$socket.client.emit('addDevice', { auth: localStorage.getItem('userToken'), code: +this.newCode });
+      this.$socket.client.emit('addDevice', {
+        auth: localStorage.getItem('userToken'),
+        code: +this.newCode,
+        remarkName: this.newName,
+      });
       const newCodeTmp = +this.newCode;
       this.newCode = '';
       this.newName = '';

@@ -32,6 +32,7 @@ module.exports = app;
 
 // Socket通讯相关 无法放在路由文件中 以后会改
 const User = require('./models/user');
+const Device = require('./models/device');
 
 const io = require('socket.io')(server, {
   cors: {
@@ -53,15 +54,26 @@ io.on('connection', socket => {
     console.log(`User [ ${socket.id} ] created with auth [ ${auth} ]`);
   });
   // 添加新设备
-  socket.on('addDevice', async ({ auth, code }) => {
+  socket.on('addDevice', async ({ auth, code, remarkName }) => {
     const { userId } = jwt.verify(auth, cfg.token.secret);
     const { fullName, username } = await User.findById(userId);
     // 给指定设备发送请求
-    socket.to(`${code}`).emit('deviceAddReq', { fullName, auth });
+    socket.to(`${code}`).emit('deviceAddReq', { fullName, remarkName, auth });
     console.log(`User [ ${username} ] want to connect Device [ ${code} ]`);
   });
   // 新设备是否同意被添加
-  socket.on('allowAddDevice', ({ result, code, userAuth }) => {FF
+  socket.on('allowAddDevice', async ({ result, code, remarkName, userAuth }) => {
+    if (result) {
+      const { userId } = jwt.verify(userAuth, cfg.token.secret);
+      const { fullName, username } = await User.findById(userId);
+      // 将用户姓名存入设备数据库
+      await Device.findOneAndUpdate({ code }, { $push: { users: fullName } });
+      // 将设备代码存入用户数据库
+      await User.findByIdAndUpdate(userId, { $push: { devices: { _id: code, name: remarkName } } });
+      console.log(`Add Device [ ${code} ] by User [ ${username} ] successfully!`);
+    } else {
+      console.log(`Device [ ${code} ] reject User [ ${username} ] add request`);
+    }
     socket.to(`${userAuth}`).emit('askDeviceRes', { result, code });
   });
 });

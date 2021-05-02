@@ -69,6 +69,7 @@ router.post('/register', async (req, res) => {
           fullName: req.body.fullName,
           username: req.body.username,
           password: crypto.createHash('sha256').update(req.body.password).digest('hex'),
+          device: [],
         });
         userRes = await user.save();
         res.sendStatus(201);

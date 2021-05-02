@@ -27,6 +27,7 @@ router.get('/code', async (req, res) => {
         // 将客户端MAC地址+硬盘标识符生成的pcID加密
         _id: crypto.createHash('sha256').update(req.query.pcId).digest('hex'),
         code,
+        users: [],
       });
       const deviceRes = await device.save();
       res.json({ code });
