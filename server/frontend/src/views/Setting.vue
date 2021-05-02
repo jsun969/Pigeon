@@ -236,7 +236,6 @@ export default {
         response: {
           status,
           data: { error },
-          s,
         },
       }) {
         if (status === 500) {

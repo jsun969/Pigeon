@@ -61,7 +61,7 @@ io.on('connection', socket => {
     console.log(`User [ ${username} ] want to connect Device [ ${code} ]`);
   });
   // 新设备是否同意被添加
-  socket.on('allowAddDevice', ({ result, code, userAuth }) => {
+  socket.on('allowAddDevice', ({ result, code, userAuth }) => {FF
     socket.to(`${userAuth}`).emit('askDeviceRes', { result, code });
   });
 });

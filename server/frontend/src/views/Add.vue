@@ -23,9 +23,7 @@
       </v-row>
       <v-row style="padding:0px 8px 0px 8px">
         <v-col>
-          <v-btn block large color="primary" :disabled="isAddingErr || !newName || !newCode" @click="addNewDevice()"
-            >添加</v-btn
-          >
+          <v-btn block large color="primary" :disabled="isAddingErr || !newName || !newCode" @click="add()">添加</v-btn>
         </v-col>
       </v-row>
     </v-container>
@@ -60,11 +58,21 @@
               ></v-text-field>
             </td>
             <td>
-              <v-btn icon color="green" :disabled="item.status === 2" v-if="!item.editing" @click="startEditing({ index })">
+              <v-btn
+                icon
+                color="green"
+                :disabled="item.status === 2"
+                v-if="!item.editing"
+                @click="startEditingDevice({ index })"
+              >
                 <v-icon>mdi-playlist-edit</v-icon>
               </v-btn>
-              <v-btn icon color="red" :disabled="item.status === 2" v-if="!item.editing"><v-icon>mdi-delete</v-icon></v-btn>
-              <v-btn icon color="red" v-if="item.editing" @click="stopEditing({ index })"><v-icon>mdi-close</v-icon></v-btn>
+              <v-btn icon color="red" :disabled="item.status === 2" v-if="!item.editing" @click="remove(item)">
+                <v-icon>mdi-delete</v-icon>
+              </v-btn>
+              <v-btn icon color="red" v-if="item.editing" @click="stopEditingDevice({ index })"
+                ><v-icon>mdi-close</v-icon></v-btn
+              >
               <v-btn
                 icon
                 color="green"
@@ -88,7 +96,7 @@ import { mapState, mapMutations } from 'vuex';
 export default {
   name: 'Add',
   data: () => ({
-    newCode: '',
+    newCode: null,
     newName: '',
     isAddingErr: false,
     codeRules: [
@@ -103,24 +111,44 @@ export default {
   }),
   sockets: {
     askDeviceRes({ result, code }) {
-      if(result){
-        
+      if (result) {
+        this.setDeviceStatus({ code, status: 0 });
+      } else {
+        this.removeDevice({ code });
       }
     },
   },
   methods: {
     confirmEdit(item, index) {
       this.setDeviceName({ index, newName: item.editingName });
-      this.stopEditing({ index });
+      this.stopEditingDevice({ index });
       //缺少:后端请求代码
     },
-    addNewDevice() {
+    add() {
       this.addDevice({ code: +this.newCode, name: this.newName });
       this.$socket.client.emit('addDevice', { auth: localStorage.getItem('userToken'), code: +this.newCode });
+      const newCodeTmp = +this.newCode;
       this.newCode = '';
       this.newName = '';
+      // 设备状态超时则删除
+      setTimeout(() => {
+        if (this.devices.filter(({ code }) => code === newCodeTmp)[0].status === 2) {
+          this.removeDevice({ code: newCodeTmp });
+        }
+      }, 31000);
     },
-    ...mapMutations(['setDeviceName', 'startEditing', 'stopEditing', 'addDevice']),
+    remove({ code }) {
+      this.showDialog({ value: { name: 'removeDevice', code }, style: 2, text: '确认删除设备?' });
+    },
+    ...mapMutations([
+      'setDeviceName',
+      'startEditingDevice',
+      'stopEditingDevice',
+      'addDevice',
+      'showDialog',
+      'removeDevice',
+      'setDeviceStatus',
+    ]),
   },
   computed: {
     ...mapState(['devices']),

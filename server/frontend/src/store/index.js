@@ -43,11 +43,11 @@ export default new Vuex.Store({
     setDeviceName(state, payload) {
       state.devices[payload.index].name = payload.newName;
     },
-    startEditing(state, payload) {
+    startEditingDevice(state, payload) {
       state.devices[payload.index].editing = true;
       state.devices[payload.index].editingName = state.devices[payload.index].name;
     },
-    stopEditing(state, payload) {
+    stopEditingDevice(state, payload) {
       state.devices[payload.index].editing = false;
     },
     addDevice(state, payload) {
@@ -55,7 +55,13 @@ export default new Vuex.Store({
       state.devices.unshift({ code, name, status: 2, editing: false, editingName: '' });
     },
     removeDevice(state, payload) {
-      state.devices
+      state.devices.splice(
+        state.devices.findIndex(({ code }) => code === payload.code),
+        1
+      );
+    },
+    setDeviceStatus(state, payload) {
+      state.devices[state.devices.findIndex(({ code }) => code === payload.code)].status = payload.status;
     },
   },
   getters: {

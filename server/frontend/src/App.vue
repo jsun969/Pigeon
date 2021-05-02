@@ -69,12 +69,14 @@ export default {
         localStorage.removeItem('userToken');
         this.userLogin({ value: false });
         this.$router.push({ name: 'Home' });
+      } else if (value.name === 'removeDevice') {
+        this.removeDevice({ code: value.code });
       }
     },
     refuseCloseDialog() {
       this.hideDialog();
     },
-    ...mapMutations(['hideDialog', 'userLogin', 'setFullName']),
+    ...mapMutations(['hideDialog', 'userLogin', 'setFullName', 'removeDevice']),
   },
   computed: {
     ...mapState(['isLogin', 'userFullName', 'dialog', 'newFullNameWhenChange']),

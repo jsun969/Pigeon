@@ -9,6 +9,9 @@
       </v-progress-circular>
       {{ newUser }}老师请求绑定此设备
       <template v-slot:action="{ attrs }">
+        <v-btn color="pink" text v-bind="attrs" @click="refuse">
+          拒绝
+        </v-btn>
         <v-btn color="pink" text v-bind="attrs" @click="accept">
           同意
         </v-btn>
@@ -54,8 +57,6 @@ export default {
             this.lastTimes--;
             countdown();
           } else {
-            // 超时则拒绝添加用户
-            this.$socket.client.emit('allowAddDevice', { result: false, auth });
             clearTimeout(this.timer);
           }
         }, 1000);
@@ -72,6 +73,11 @@ export default {
       this.snackbar = false;
       this.$socket.client.emit('allowAddDevice', { result: true, code: this.code, userAuth: this.newUserAuth });
       this.users.push(this.newUser);
+    },
+    refuse() {
+      clearTimeout(this.timer);
+      this.snackbar = false;
+      this.$socket.client.emit('allowAddDevice', { result: false, code: this.code, userAuth: this.newUserAuth });
     },
   },
   computed: {
