@@ -41,11 +41,14 @@ const io = require('socket.io')(server, {
   },
 });
 
+// 在线设备缓存
+let onlineDevice = [];
 io.on('connection', socket => {
   console.log(`[ ${socket.id} ] connect`);
   // 设备上线
   socket.on('newDeviceCreated', ({ code }) => {
     socket.join(`${code}`);
+    onlineDevice.push(code);
     console.log(`Device [ ${socket.id} ] created with code [ ${code} ]`);
   });
   // 用户上线
@@ -69,11 +72,18 @@ io.on('connection', socket => {
       // 将用户姓名存入设备数据库
       await Device.findOneAndUpdate({ code }, { $push: { users: fullName } });
       // 将设备代码存入用户数据库
-      await User.findByIdAndUpdate(userId, { $push: { devices: { _id: code, name: remarkName } } });
+      await User.findByIdAndUpdate(userId, { $push: { devices: { code, name: remarkName } } });
       console.log(`Add Device [ ${code} ] by User [ ${username} ] successfully!`);
     } else {
       console.log(`Device [ ${code} ] reject User [ ${username} ] add request`);
     }
     socket.to(`${userAuth}`).emit('askDeviceRes', { result, code });
+  });
+  // 获取全部在线设备
+  socket.on('getDevice', async ({ auth }, fn) => {
+    const { userId } = jwt.verify(auth, cfg.token.secret);
+    const { devices, username } = await User.findById(userId);
+    fn(devices.map(({ code, name }) => ({ code, name, status: onlineDevice.includes(code) ? 0 : 1 })));
+    console.log(`User ${username} get devices successfully!`);
   });
 });

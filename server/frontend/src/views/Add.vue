@@ -95,6 +95,9 @@ import { mapState, mapMutations } from 'vuex';
 
 export default {
   name: 'Add',
+  mounted() {
+    this.getAllDevices();
+  },
   data: () => ({
     newCode: null,
     newName: '',
@@ -152,6 +155,7 @@ export default {
       'showDialog',
       'removeDevice',
       'setDeviceStatus',
+      'getAllDevices',
     ]),
   },
   computed: {

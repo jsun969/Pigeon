@@ -15,11 +15,7 @@ export default new Vuex.Store({
     userFullName: null,
     // 确定弹窗后修改前端新姓名的一个临时的全局变量 还没找到别的方法
     newFullNameWhenChange: null,
-    devices: [
-      { code: 114514, name: '初三16班', status: 0, editing: false, editingName: '' },
-      { code: 458962, name: '初一99班', status: 1, editing: false, editingName: '' },
-      { code: 898919, name: '不知道几班', status: 2, editing: false, editingName: '' },
-    ],
+    devices: [],
   },
   mutations: {
     userLogin(state, payload) {
@@ -62,6 +58,11 @@ export default new Vuex.Store({
     },
     setDeviceStatus(state, payload) {
       state.devices[state.devices.findIndex(({ code }) => code === payload.code)].status = payload.status;
+    },
+    getAllDevices(state) {
+      this._vm.$socket.client.emit('getDevice', { auth: localStorage.getItem('userToken') }, devices => {
+        state.devices = devices.map(({ code, name, status }) => ({ code, name, status, editing: false, editingName: '' }));
+      });
     },
   },
   getters: {

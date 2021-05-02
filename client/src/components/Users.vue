@@ -22,23 +22,22 @@
 
 <script>
 import { mapState } from 'vuex';
+import axios from 'axios';
 
 export default {
   name: 'Users',
+  async mounted() {
+    try {
+      const { status, data } = (await axios.get('/device/users', { params: { code: this.code } })) || {};
+      if (status === 200) {
+        this.users = data;
+      }
+    } catch (error) {
+      return;
+    }
+  },
   data: () => ({
-    users: [
-      'Gerald Higgins',
-      'Marion Hampton',
-      'Katie Thomas',
-      'Craig Taylor',
-      'Sam Guzman',
-      'Ricky Oliver',
-      'Ida Diaz',
-      'Tommy Adams',
-      'Benjamin Chavez',
-      'Isabel Sanchez',
-      'Alma Miles',
-    ],
+    users: [],
     snackbar: false,
     newUser: null,
     newUserAuth: null,

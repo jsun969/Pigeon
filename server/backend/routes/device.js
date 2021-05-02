@@ -2,11 +2,14 @@ const cfg = require('../config');
 
 const express = require('express');
 const crypto = require('crypto');
+const jwt = require('jsonwebtoken');
 
 const router = express.Router();
 
+const User = require('../models/user');
 const Device = require('../models/device');
 
+// 获取设备代号
 router.get('/code', async (req, res) => {
   try {
     // 判断设备是否已注册
@@ -33,6 +36,18 @@ router.get('/code', async (req, res) => {
       res.json({ code });
       console.log(`Device [ ${deviceRes.code} ] register successfully!`);
     }
+  } catch (error) {
+    console.error(error);
+    res.sendStatus(500);
+  }
+});
+
+// 获取已绑定的用户姓名
+router.get('/users', async (req, res) => {
+  try {
+    const { users } = await Device.findOne({ code: req.query.code });
+    res.json(users);
+    console.log(`Device ${req.query.code} get users successfully!`);
   } catch (error) {
     console.error(error);
     res.sendStatus(500);
