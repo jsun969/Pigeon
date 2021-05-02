@@ -120,6 +120,12 @@ export default {
         this.removeDevice({ code });
       }
     },
+    deviceOnline({ code }) {
+      this.setDeviceStatus({ code, status: 0 });
+    },
+    deviceOffline({ code }) {
+      this.setDeviceStatus({ code, status: 1 });
+    },
   },
   methods: {
     confirmEdit(item, index) {
@@ -139,7 +145,7 @@ export default {
       this.newName = '';
       // 设备状态超时则删除
       setTimeout(() => {
-        if (this.devices.filter(({ code }) => code === newCodeTmp)[0].status === 2) {
+        if (this.devices.find(({ code }) => code === newCodeTmp).status === 2) {
           this.removeDevice({ code: newCodeTmp });
         }
       }, 31000);

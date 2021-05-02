@@ -46,21 +46,32 @@ let onlineDevice = [];
 io.on('connection', socket => {
   console.log(`[ ${socket.id} ] connect`);
   // 设备上线
-  socket.on('newDeviceCreated', ({ code }) => {
+  socket.on('deviceCreated', ({ code }) => {
     socket.join(`${code}`);
-    onlineDevice.push(code);
+    onlineDevice.push({ code, id: socket.id });
+    socket.broadcast.emit('deviceOnline', { code });
     console.log(`Device [ ${socket.id} ] created with code [ ${code} ]`);
   });
   // 用户上线
-  socket.on('newUserCreated', ({ auth }) => {
+  socket.on('userCreated', ({ auth }) => {
     socket.join(`${auth}`);
     console.log(`User [ ${socket.id} ] created with auth [ ${auth} ]`);
+  });
+  // // 设备下线
+  socket.on('disconnect', () => {
+    if (onlineDevice.some(({ id }) => id === socket.id)) {
+      console.log(`Device [ ${onlineDevice.find(({ id }) => id === socket.id).code} ] destroy`);
+      socket.broadcast.emit('deviceOffline', { code: onlineDevice.find(({ id }) => id === socket.id).code });
+      onlineDevice.splice(
+        onlineDevice.findIndex(({ id }) => id === socket.id),
+        1
+      );
+    }
   });
   // 添加新设备
   socket.on('addDevice', async ({ auth, code, remarkName }) => {
     const { userId } = jwt.verify(auth, cfg.token.secret);
     const { fullName, username } = await User.findById(userId);
-    // 给指定设备发送请求
     socket.to(`${code}`).emit('deviceAddReq', { fullName, remarkName, auth });
     console.log(`User [ ${username} ] want to connect Device [ ${code} ]`);
   });
@@ -83,7 +94,15 @@ io.on('connection', socket => {
   socket.on('getDevice', async ({ auth }, fn) => {
     const { userId } = jwt.verify(auth, cfg.token.secret);
     const { devices, username } = await User.findById(userId);
-    fn(devices.map(({ code, name }) => ({ code, name, status: onlineDevice.includes(code) ? 0 : 1 })));
+    fn(
+      devices
+        .map(({ code, name }) => ({
+          code,
+          name,
+          status: onlineDevice.some(({ code: codeTmp }) => codeTmp === code) ? 0 : 1,
+        }))
+        .reverse()
+    );
     console.log(`User ${username} get devices successfully!`);
   });
 });

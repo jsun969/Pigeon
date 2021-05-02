@@ -47,12 +47,15 @@ export default {
   mounted() {
     this.getCode();
   },
+  beforeDestroy() {
+    this.$socket.client.emit('deviceDestroy', { code: this.code });
+  },
   data: () => ({
     tabs: 0,
   }),
   sockets: {
     connect() {
-      this.$socket.client.emit('newDeviceCreated', { code: this.code });
+      this.$socket.client.emit('deviceCreated', { code: this.code });
     },
   },
   methods: {

@@ -49,7 +49,7 @@ export default {
   },
   sockets: {
     connect() {
-      this.$socket.client.emit('newUserCreated', { auth: localStorage.getItem('userToken') });
+      this.$socket.client.emit('userCreated', { auth: localStorage.getItem('userToken') });
     },
   },
   methods: {

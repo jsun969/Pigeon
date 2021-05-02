@@ -6,12 +6,7 @@ Vue.use(Vuex);
 export default new Vuex.Store({
   state: {
     isLogin: false,
-    dialog: {
-      value: '',
-      open: false,
-      text: '',
-      style: 0,
-    },
+    dialog: { value: '', open: false, text: '', style: 0 },
     userFullName: null,
     // 确定弹窗后修改前端新姓名的一个临时的全局变量 还没找到别的方法
     newFullNameWhenChange: null,
@@ -47,8 +42,7 @@ export default new Vuex.Store({
       state.devices[payload.index].editing = false;
     },
     addDevice(state, payload) {
-      const { code, name } = payload;
-      state.devices.unshift({ code, name, status: 2, editing: false, editingName: '' });
+      state.devices.unshift({ code: payload.code, name: payload.name, status: 2, editing: false, editingName: '' });
     },
     removeDevice(state, payload) {
       state.devices.splice(
