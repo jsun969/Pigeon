@@ -6,7 +6,7 @@
           <v-text-field
             v-model="newCode"
             label="设备代码"
-            :rules="[...codeRules, !devices.map(({ code }) => code).includes(+newCode) || !newCode || '设备已添加']"
+            :rules="[...codeRules, !devices.map(({ code }) => code).includes(newCode) || !newCode || '设备已添加']"
             @update:error="isAddingErr = $event"
             outlined
           ></v-text-field>
@@ -92,6 +92,7 @@
 
 <script>
 import { mapState, mapMutations } from 'vuex';
+import axios from 'axios';
 
 export default {
   name: 'Add',
@@ -128,19 +129,27 @@ export default {
     },
   },
   methods: {
-    confirmEdit(item, index) {
+    async confirmEdit(item, index) {
       this.setDeviceName({ index, newName: item.editingName });
       this.stopEditingDevice({ index });
-      //缺少:后端请求代码
+      try {
+        const { status } =
+          (await axios.patch('/device/remarkName', { code: this.devices[index].code, name: item.editingName })) || {};
+        if (status === 200) {
+          console.log('change succeed');
+        }
+      } catch {
+        return;
+      }
     },
     add() {
-      this.addDevice({ code: +this.newCode, name: this.newName });
+      this.addDevice({ code: this.newCode, name: this.newName });
       this.$socket.client.emit('addDevice', {
         auth: localStorage.getItem('userToken'),
-        code: +this.newCode,
+        code: this.newCode,
         remarkName: this.newName,
       });
-      const newCodeTmp = +this.newCode;
+      const newCodeTmp = this.newCode;
       this.newCode = '';
       this.newName = '';
       // 设备状态超时则删除

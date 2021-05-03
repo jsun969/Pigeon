@@ -47,7 +47,7 @@ io.on('connection', socket => {
   console.log(`[ ${socket.id} ] connect`);
   // 设备上线
   socket.on('deviceCreated', ({ code }) => {
-    socket.join(`${code}`);
+    socket.join(code);
     onlineDevice.push({ code, id: socket.id });
     socket.broadcast.emit('deviceOnline', { code });
     console.log(`Device [ ${socket.id} ] created with code [ ${code} ]`);
@@ -57,7 +57,7 @@ io.on('connection', socket => {
     socket.join(`${auth}`);
     console.log(`User [ ${socket.id} ] created with auth [ ${auth} ]`);
   });
-  // // 设备下线
+  // 设备下线
   socket.on('disconnect', () => {
     if (onlineDevice.some(({ id }) => id === socket.id)) {
       console.log(`Device [ ${onlineDevice.find(({ id }) => id === socket.id).code} ] destroy`);

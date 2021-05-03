@@ -8,6 +8,7 @@ const router = express.Router();
 
 const User = require('../models/user');
 const Device = require('../models/device');
+const { log } = require('console');
 
 // 获取设备代号
 router.get('/code', async (req, res) => {
@@ -48,6 +49,20 @@ router.get('/users', async (req, res) => {
     const { users } = await Device.findOne({ code: req.query.code });
     res.json(users);
     console.log(`Device ${req.query.code} get users successfully!`);
+  } catch (error) {
+    console.error(error);
+    res.sendStatus(500);
+  }
+});
+
+// 修改设备备注名
+router.patch('/remarkName', async (req, res) => {
+  try {
+    const { userId } = jwt.verify(req.headers.auth, cfg.token.secret);
+    const { username } = await User.findById(userId);
+    await User.updateOne({ _id: userId, 'devices.code': req.body.code }, { $set: { 'devices.$.name': req.body.name } });
+    console.log(`User [ ${username} ] modify Device [ ${req.body.code} ] name to [ ${req.body.name} ]`);
+    res.sendStatus(200);
   } catch (error) {
     console.error(error);
     res.sendStatus(500);

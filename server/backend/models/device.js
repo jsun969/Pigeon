@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 const deviceSchema = mongoose.Schema({
   _id: String,
-  code: Number,
+  code: String,
   users: [String],
 });
 
