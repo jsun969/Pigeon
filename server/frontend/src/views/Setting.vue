@@ -2,7 +2,7 @@
   <div class="setting" style="margin-top:28px">
     <v-btn text color="primary" v-if="!showMenu" @click="backToMenu" style="position:fixed;top:67px;left:5px;">&lt;设置</v-btn>
     <div class="menu" v-if="showMenu">
-      <v-list flat v-if="$vuetify.breakpoint.name == 'xs'">
+      <v-list flat v-if="$vuetify.breakpoint.name === 'xs'">
         <div v-for="(item, i) in items" :key="i">
           <v-divider v-if="item.divider" :inset="item.inset"></v-divider>
           <v-list-item v-if="!item.divider" @click="handleClick(item.text)">

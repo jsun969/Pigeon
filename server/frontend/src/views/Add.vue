@@ -89,8 +89,9 @@
         </template>
       </v-simple-table>
     </div>
+
     <div id="PC" v-else class="ma-6 d-flex flex-wrap">
-      <v-card height="320" width="350" class="ma-5 px-6">
+      <v-card height="320" width="350" class="ma-5 px-6" outlined>
         <v-card-title class="display-1 mt-3"><v-spacer></v-spacer>添加设备<v-spacer></v-spacer></v-card-title>
         <v-text-field
           v-model="newCode"

@@ -1,12 +1,34 @@
 <template>
   <v-app>
-    <v-app-bar app color="primary" dark>
+    <v-navigation-drawer v-if="$vuetify.breakpoint.name !== 'xs' && this.isLogin" app clipped :mini-variant="drawer" permanent>
+      <v-list :shaped="!drawer">
+        <v-list-item link v-for="(item, index) in navItems" :key="index" :to="item.to" color="primary">
+          <v-list-item-icon>
+            <v-icon>{{ item.icon }}</v-icon>
+          </v-list-item-icon>
+          <v-list-item-title>{{ item.text }}</v-list-item-title>
+        </v-list-item>
+      </v-list>
+    </v-navigation-drawer>
+    <v-app-bar app color="primary" dark clipped-left>
+      <v-app-bar-nav-icon
+        @click="drawer = !drawer"
+        v-if="$vuetify.breakpoint.name !== 'xs' && this.isLogin"
+      ></v-app-bar-nav-icon>
       <v-toolbar-title>飞鸽传书</v-toolbar-title>
       <v-spacer></v-spacer>
       <span v-if="this.isLogin">欢迎您 , {{ this.userFullName }}老师</span>
     </v-app-bar>
     <UserAuth v-if="!this.isLogin" />
-    <Main v-else />
+    <v-main v-else>
+      <router-view />
+      <v-bottom-navigation fixed v-model="btmNav" color="primary" grow v-if="$vuetify.breakpoint.name === 'xs'">
+        <v-btn v-for="(item, i) in navItems" :key="i" :to="item.to" :value="item.value">
+          <span>{{ item.text }}</span>
+          <v-icon>{{ item.icon }}</v-icon>
+        </v-btn>
+      </v-bottom-navigation>
+    </v-main>
     <Dialog
       :showDialog="this.dialog.open"
       :mainText="this.dialog.text"
@@ -21,7 +43,6 @@
 <script>
 import { mapMutations, mapState } from 'vuex';
 import UserAuth from './components/UserAuth';
-import Main from './components/Main';
 import Dialog from './components/Dialog';
 import axios from 'axios';
 
@@ -29,7 +50,6 @@ export default {
   name: 'App',
   components: {
     UserAuth,
-    Main,
     Dialog,
   },
   async mounted() {
@@ -53,6 +73,15 @@ export default {
       this.$socket.client.emit('userCreated', { auth: localStorage.getItem('userToken') });
     },
   },
+  data: () => ({
+    drawer: false,
+    navItems: [
+      { to: '/', text: '发送信息', icon: 'mdi-email-send', value: 'Home' },
+      { to: '/history', text: '历史记录', icon: 'mdi-history', value: 'History' },
+      { to: '/add', text: '添加设备', icon: 'mdi-cellphone-link', value: 'Add' },
+      { to: '/setting', text: '个人设置', icon: 'mdi-account-cog', value: 'Setting' },
+    ],
+  }),
   methods: {
     closeDialog() {
       this.hideDialog();
@@ -81,6 +110,9 @@ export default {
     ...mapMutations(['hideDialog', 'userLogin', 'setFullName', 'removeDevice', 'getAllDevices']),
   },
   computed: {
+    btmNav() {
+      return this.$route.name;
+    },
     ...mapState(['isLogin', 'userFullName', 'dialog', 'newFullNameWhenChange']),
   },
 };
