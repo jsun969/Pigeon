@@ -46,22 +46,28 @@ let onlineDevice = [];
 io.on('connection', socket => {
   console.log(`[ ${socket.id} ] connect`);
   // 设备上线
-  socket.on('deviceCreated', ({ code }) => {
+  socket.on('deviceCreated', async ({ code }) => {
     socket.join(code);
     onlineDevice.push({ code, id: socket.id });
-    socket.broadcast.emit('deviceOnline', { code });
+    const { users } = await Device.findOne({ code });
+    socket.to(users.map(({ username }) => username)).emit('deviceOnline', { code });
     console.log(`Device [ ${socket.id} ] created with code [ ${code} ]`);
   });
   // 用户上线
-  socket.on('userCreated', ({ auth }) => {
-    socket.join(`${auth}`);
+  socket.on('userCreated', async ({ auth }) => {
+    const { userId } = jwt.verify(auth, cfg.token.secret);
+    const { username } = await User.findById(userId);
+    socket.join(username);
     console.log(`User [ ${socket.id} ] created with auth [ ${auth} ]`);
   });
   // 设备下线
-  socket.on('disconnect', () => {
+  socket.on('disconnect', async () => {
     if (onlineDevice.some(({ id }) => id === socket.id)) {
       console.log(`Device [ ${onlineDevice.find(({ id }) => id === socket.id).code} ] destroy`);
-      socket.broadcast.emit('deviceOffline', { code: onlineDevice.find(({ id }) => id === socket.id).code });
+      const { users } = await Device.findOne({ code: onlineDevice.find(({ id }) => id === socket.id).code });
+      socket
+        .to(users.map(({ username }) => username))
+        .emit('deviceOffline', { code: onlineDevice.find(({ id }) => id === socket.id).code });
       onlineDevice.splice(
         onlineDevice.findIndex(({ id }) => id === socket.id),
         1
@@ -81,7 +87,7 @@ io.on('connection', socket => {
       const { userId } = jwt.verify(userAuth, cfg.token.secret);
       const { fullName, username } = await User.findById(userId);
       // 将用户姓名存入设备数据库
-      await Device.findOneAndUpdate({ code }, { $push: { users: fullName } });
+      await Device.findOneAndUpdate({ code }, { $push: { users: { fullName, username } } });
       // 将设备代码存入用户数据库
       await User.findByIdAndUpdate(userId, { $push: { devices: { code, name: remarkName } } });
       console.log(`Add Device [ ${code} ] by User [ ${username} ] successfully!`);
