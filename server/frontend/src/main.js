@@ -12,7 +12,7 @@ Vue.config.productionTip = false;
 
 const socket = io('http://127.0.0.1:3000');
 
-Vue.use(VueSocketIOExt, socket);
+Vue.use(VueSocketIOExt, socket, { store });
 
 axios.defaults.baseURL = 'http://localhost:3000';
 

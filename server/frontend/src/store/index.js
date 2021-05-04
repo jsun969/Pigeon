@@ -58,6 +58,13 @@ export default new Vuex.Store({
         state.devices = devices.map(({ code, name, status }) => ({ code, name, status, editing: false, editingName: '' }));
       });
     },
+    // SocketIO
+    SOCKET_DEVICEONLINE(state, { code }) {
+      state.devices[state.devices.findIndex(({ code: codeTmp }) => codeTmp === code)].status = 0;
+    },
+    SOCKET_DEVICEOFFLINE(state, { code }) {
+      state.devices[state.devices.findIndex(({ code: codeTmp }) => codeTmp === code)].status = 1;
+    },
   },
   getters: {
     onlineDevicesName: state => {
