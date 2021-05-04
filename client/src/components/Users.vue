@@ -1,8 +1,32 @@
 <template>
   <v-container>
-    <v-chip v-for="(item, index) in users" :key="index" close style="margin:8px" @click:close="remove(index)">
+    <v-chip
+      v-for="(item, index) in users.map(({ fullName }) => fullName)"
+      :key="index"
+      close
+      style="margin:8px"
+      @click:close="confirmRemove(index)"
+    >
       {{ item }}
     </v-chip>
+
+    <v-dialog v-model="showDialog" width="300">
+      <v-card>
+        <v-card-title class="headline warning" style="color: white">警告</v-card-title>
+        <v-card-text style="padding: 24px 20px;">确认删除{{ removingUserName }}老师</v-card-text>
+        <v-divider></v-divider>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn text @click="remove(removingUserIndex)">
+            是
+          </v-btn>
+          <v-btn text @click="showDialog = false">
+            否
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
     <v-snackbar v-model="snackbar" timeout="30000">
       <v-progress-circular rotate="-90" :value="(lastTimes * 100) / 30" color="white">
         {{ lastTimes }}
@@ -41,15 +65,20 @@ export default {
     snackbar: false,
     newUser: null,
     newUserAuth: null,
+    newUserName: null,
     newRemarkName: null,
     lastTimes: 30,
     timer: null,
+    showDialog: false,
+    removingUserName: null,
+    removingUserIndex: null,
   }),
   sockets: {
-    deviceAddReq({ fullName, remarkName, auth }) {
+    deviceAddReq({ fullName, remarkName, auth, username }) {
       this.newUser = fullName;
       this.newUserAuth = auth;
       this.newRemarkName = remarkName;
+      this.newUserName = username;
       this.snackbar = true;
       this.lastTimes = 30;
       const countdown = () => {
@@ -66,7 +95,14 @@ export default {
     },
   },
   methods: {
+    confirmRemove(index) {
+      this.removingUserIndex = index;
+      this.removingUserName = this.users[index].fullName;
+      this.showDialog = true;
+    },
     remove(index) {
+      this.showDialog = false;
+      this.$socket.client.emit('removeUser', { name: this.users[index].username, code: this.code });
       this.users.splice(index, 1);
     },
     accept() {
@@ -78,7 +114,7 @@ export default {
         remarkName: this.newRemarkName,
         userAuth: this.newUserAuth,
       });
-      this.users.push(this.newUser);
+      this.users.push({ fullName: this.newUser, username: this.newUserName });
     },
     refuse() {
       clearTimeout(this.timer);

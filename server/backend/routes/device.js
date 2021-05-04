@@ -47,8 +47,8 @@ router.get('/code', async (req, res) => {
 router.get('/users', async (req, res) => {
   try {
     const { users } = await Device.findOne({ code: req.query.code });
-    res.json(users.map(({ fullName }) => fullName));
-    console.log(`Device ${req.query.code} get users successfully!`);
+    res.json(users.map(({ fullName, username }) => ({ fullName, username })));
+    console.log(`Device [ ${req.query.code} ] get users successfully!`);
   } catch (error) {
     console.error(error);
     res.sendStatus(500);

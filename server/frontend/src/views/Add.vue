@@ -112,12 +112,15 @@ export default {
       },
     ],
     isEditingError: false,
+    timeoutTimer: null,
   }),
   sockets: {
     askDeviceRes({ result, code }) {
       if (result) {
+        clearTimeout(this.timeoutTimer);
         this.setDeviceStatus({ code, status: 0 });
       } else {
+        clearTimeout(this.timeoutTimer);
         this.removeDevice({ code });
       }
     },
@@ -126,6 +129,9 @@ export default {
     },
     deviceOffline({ code }) {
       this.setDeviceStatus({ code, status: 1 });
+    },
+    removeUserHotUpdate({ code }) {
+      this.removeDevice({ code });
     },
   },
   methods: {
@@ -153,7 +159,7 @@ export default {
       this.newCode = '';
       this.newName = '';
       // 设备状态超时则删除
-      setTimeout(() => {
+      this.timeoutTimer = setTimeout(() => {
         if (this.devices.find(({ code }) => code === newCodeTmp).status === 2) {
           this.removeDevice({ code: newCodeTmp });
         }
