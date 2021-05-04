@@ -93,6 +93,12 @@ export default {
       };
       countdown();
     },
+    removeDeviceHotUpdate({ name }) {
+      this.users.splice(
+        this.users.findIndex(({ username }) => username === name),
+        1
+      );
+    },
   },
   methods: {
     confirmRemove(index) {

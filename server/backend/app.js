@@ -125,4 +125,14 @@ io.on('connection', socket => {
     socket.to(name).emit('removeUserHotUpdate', { code });
     console.log(`Device [ ${code} ] remove user [ ${name} ]`);
   });
+
+  // 用户删除设备
+  socket.on('removeDevice', async ({ auth, code }) => {
+    const { userId } = jwt.verify(auth, cfg.token.secret);
+    const { username } = await User.findById(userId);
+    await User.updateOne({ username }, { $pull: { devices: { code } } });
+    await Device.updateOne({ code }, { $pull: { users: { username } } });
+    socket.to(code).emit('removeDeviceHotUpdate', { name: username });
+    console.log(`User [ ${username} ] remove device [ ${code} ]`);
+  });
 });

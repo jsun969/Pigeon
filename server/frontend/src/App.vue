@@ -32,7 +32,8 @@ export default {
     Main,
     Dialog,
   },
-  async created() {
+  async mounted() {
+    this.getAllDevices();
     try {
       const {
         status,
@@ -70,13 +71,14 @@ export default {
         this.userLogin({ value: false });
         this.$router.push({ name: 'Home' });
       } else if (value.name === 'removeDevice') {
+        this.$socket.client.emit('removeDevice', { auth: localStorage.getItem('userToken'), code: value.code });
         this.removeDevice({ code: value.code });
       }
     },
     refuseCloseDialog() {
       this.hideDialog();
     },
-    ...mapMutations(['hideDialog', 'userLogin', 'setFullName', 'removeDevice']),
+    ...mapMutations(['hideDialog', 'userLogin', 'setFullName', 'removeDevice', 'getAllDevices']),
   },
   computed: {
     ...mapState(['isLogin', 'userFullName', 'dialog', 'newFullNameWhenChange']),
