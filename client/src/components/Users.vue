@@ -4,7 +4,7 @@
       v-for="(item, index) in users.map(({ fullName }) => fullName)"
       :key="index"
       close
-      style="margin:8px"
+      class="ma-2"
       @click:close="confirmRemove(index)"
     >
       {{ item }}
@@ -12,8 +12,8 @@
 
     <v-dialog v-model="showDialog" width="300">
       <v-card>
-        <v-card-title class="headline warning" style="color: white">警告</v-card-title>
-        <v-card-text style="padding: 24px 20px;">确认删除{{ removingUserName }}老师</v-card-text>
+        <v-card-title class="headline warning white--text">警告</v-card-title>
+        <v-card-text class="py-6 px-5">确认删除{{ removingUserName }}老师</v-card-text>
         <v-divider></v-divider>
         <v-card-actions>
           <v-spacer></v-spacer>
@@ -28,7 +28,7 @@
     </v-dialog>
 
     <v-snackbar v-model="snackbar" timeout="30000">
-      <v-progress-circular rotate="-90" :value="(lastTimes * 100) / 30" color="white">
+      <v-progress-circular rotate="-90" :value="(lastTimes * 100) / 30" color="white" class="mr-2">
         {{ lastTimes }}
       </v-progress-circular>
       {{ newUser }}老师请求绑定此设备

@@ -1,92 +1,168 @@
 <template>
   <div class="add">
-    <v-container>
-      <v-row style="margin:4px 0px -36px">
-        <v-col>
-          <v-text-field
-            v-model="newCode"
-            label="设备代码"
-            :rules="[...codeRules, !devices.map(({ code }) => code).includes(newCode) || !newCode || '设备已添加']"
-            @update:error="isAddingErr = $event"
-            outlined
-          ></v-text-field>
-        </v-col>
-        <v-col>
-          <v-text-field
-            v-model="newName"
-            label="备注名"
-            :rules="[!devices.map(({ name }) => name).includes(newName) || !newName || '备注名重复']"
-            @update:error="isAddingErr = $event"
-            outlined
-          ></v-text-field>
-        </v-col>
-      </v-row>
-      <v-row style="padding:0px 8px 0px 8px">
-        <v-col>
-          <v-btn block large color="primary" :disabled="isAddingErr || !newName || !newCode" @click="add()">添加</v-btn>
-        </v-col>
-      </v-row>
-    </v-container>
-    <v-simple-table fixed-header>
-      <template v-slot:default>
-        <thead>
-          <tr>
-            <th class="text-left">状态</th>
-            <th class="text-left">代码</th>
-            <th class="text-left">备注</th>
-            <th class="text-left">操作</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="(item, index) in devices" :key="index">
-            <td :style="{ color: ['green', 'red', 'gray'][item.status] }">{{ ['在线', '离线', '未知'][item.status] }}</td>
-            <td>{{ item.code }}</td>
-            <td v-if="!item.editing">{{ item.name }}</td>
-            <td v-if="item.editing" style="width:130px">
-              <v-text-field
-                v-model="item.editingName"
-                :rules="[
-                  !devices
-                    .map(({ name }) => name)
-                    .filter(val => val !== item.name)
-                    .includes(item.editingName) ||
-                    !item.editingName ||
-                    '备注名重复',
-                  !!item.editingName || '请输入备注',
-                ]"
-                @update:error="isEditingError = $event"
-              ></v-text-field>
-            </td>
-            <td>
-              <v-btn
-                icon
-                color="green"
-                :disabled="item.status === 2"
-                v-if="!item.editing"
-                @click="startEditingDevice({ index })"
-              >
-                <v-icon>mdi-playlist-edit</v-icon>
+    <div id="mobile" v-if="$vuetify.breakpoint.name == 'xs'">
+      <v-container>
+        <v-row class="mt-2 mb-n9">
+          <v-col>
+            <v-text-field
+              v-model="newCode"
+              label="设备代码"
+              :rules="[...codeRules, !devices.map(({ code }) => code).includes(newCode) || !newCode || '设备已添加']"
+              @update:error="isAddingErr = $event"
+              outlined
+            ></v-text-field>
+          </v-col>
+          <v-col>
+            <v-text-field
+              v-model="newName"
+              label="备注名"
+              :rules="[!devices.map(({ name }) => name).includes(newName) || !newName || '备注名重复']"
+              @update:error="isAddingErr = $event"
+              outlined
+            ></v-text-field>
+          </v-col>
+        </v-row>
+        <v-row class="px-2">
+          <v-col>
+            <v-btn block large color="primary" :disabled="isAddingErr || !newName || !newCode" @click="add()">添加</v-btn>
+          </v-col>
+        </v-row>
+      </v-container>
+      <v-simple-table fixed-header>
+        <template v-slot:default>
+          <thead>
+            <tr>
+              <th class="text-left">状态</th>
+              <th class="text-left">代码</th>
+              <th class="text-left">备注</th>
+              <th class="text-left">操作</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="(item, index) in devices" :key="index">
+              <td :style="{ color: ['green', 'red', 'gray'][item.status] }">{{ ['在线', '离线', '未知'][item.status] }}</td>
+              <td>{{ item.code }}</td>
+              <td v-if="!item.editing">{{ item.name }}</td>
+              <td v-if="item.editing" style="width:130px">
+                <v-text-field
+                  v-model="item.editingName"
+                  :rules="[
+                    !devices
+                      .map(({ name }) => name)
+                      .filter(val => val !== item.name)
+                      .includes(item.editingName) ||
+                      !item.editingName ||
+                      '备注名重复',
+                    !!item.editingName || '请输入备注',
+                  ]"
+                  @update:error="isEditingError = $event"
+                ></v-text-field>
+              </td>
+              <td>
+                <v-btn
+                  icon
+                  color="green"
+                  :disabled="item.status === 2"
+                  v-if="!item.editing"
+                  @click="startEditingDevice({ index })"
+                >
+                  <v-icon>mdi-playlist-edit</v-icon>
+                </v-btn>
+                <v-btn icon color="red" :disabled="item.status === 2" v-if="!item.editing" @click="remove(item)">
+                  <v-icon>mdi-delete</v-icon>
+                </v-btn>
+                <v-btn icon color="red" v-if="item.editing" @click="stopEditingDevice({ index })">
+                  <v-icon>mdi-close</v-icon>
+                </v-btn>
+                <v-btn
+                  icon
+                  color="green"
+                  v-if="item.editing"
+                  @click="confirmEdit(item, index)"
+                  :disabled="isEditingError || item.editingName === item.name"
+                >
+                  <v-icon>mdi-check</v-icon>
+                </v-btn>
+              </td>
+            </tr>
+          </tbody>
+        </template>
+      </v-simple-table>
+    </div>
+    <div id="PC" v-else class="ma-6 d-flex flex-wrap">
+      <v-card height="320" width="350" class="ma-5 px-6">
+        <v-card-title class="display-1 mt-3"><v-spacer></v-spacer>添加设备<v-spacer></v-spacer></v-card-title>
+        <v-text-field
+          v-model="newCode"
+          label="设备代码"
+          :rules="[...codeRules, !devices.map(({ code }) => code).includes(newCode) || !newCode || '设备已添加']"
+          @update:error="isAddingErr = $event"
+        ></v-text-field>
+        <v-text-field
+          v-model="newName"
+          label="备注名"
+          :rules="[!devices.map(({ name }) => name).includes(newName) || !newName || '备注名重复']"
+          @update:error="isAddingErr = $event"
+          class="mb-2"
+        ></v-text-field>
+        <v-btn block large color="primary" :disabled="isAddingErr || !newName || !newCode" @click="add()">确定</v-btn>
+      </v-card>
+      <v-card width="350" hover v-for="(item, index) in devices" :key="index" class="ma-5" :loading="item.status === 2">
+        <v-card-title>
+          <v-spacer></v-spacer>
+          <div id="editing-name" v-if="item.editing" class="d-flex">
+            <v-text-field
+              v-model="item.editingName"
+              outlined
+              placeholder="新备注"
+              class="mr-2"
+              :rules="[
+                !devices
+                  .map(({ name }) => name)
+                  .filter(val => val !== item.name)
+                  .includes(item.editingName) ||
+                  !item.editingName ||
+                  '备注名重复',
+                !!item.editingName || '请输入备注',
+              ]"
+              @update:error="isEditingError = $event"
+            ></v-text-field>
+            <div id="editing-name-operation" class="d-flex flex-column">
+              <v-btn dark small color="red" @click="stopEditingDevice({ index })" class="mb-1">
+                取消
               </v-btn>
-              <v-btn icon color="red" :disabled="item.status === 2" v-if="!item.editing" @click="remove(item)">
-                <v-icon>mdi-delete</v-icon>
-              </v-btn>
-              <v-btn icon color="red" v-if="item.editing" @click="stopEditingDevice({ index })"
-                ><v-icon>mdi-close</v-icon></v-btn
-              >
               <v-btn
-                icon
+                :dark="!(isEditingError || item.editingName === item.name)"
+                small
                 color="green"
-                v-if="item.editing"
                 @click="confirmEdit(item, index)"
                 :disabled="isEditingError || item.editingName === item.name"
               >
-                <v-icon>mdi-check</v-icon>
+                确定
               </v-btn>
-            </td>
-          </tr>
-        </tbody>
-      </template>
-    </v-simple-table>
+            </div>
+          </div>
+          <span v-else>{{ item.name }}</span>
+          <v-spacer></v-spacer>
+        </v-card-title>
+        <v-card-subtitle class="text-center"> 设备代码 : {{ item.code }} </v-card-subtitle>
+        <v-card-text class="d-flex flex-column text-center">
+          <v-icon size="128">mdi-laptop</v-icon>
+          <span :class="['green--text', 'red--text', 'gray--text'][item.status]">
+            <v-icon :color="['green', 'red', 'gray'][item.status]">mdi-circle-medium</v-icon>
+            {{ ['在线', '离线', '未知'][item.status] }}
+          </span>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="cyan" dark class="mx-2 mb-4" @click="startEditingDevice({ index })">
+            <v-icon left>mdi-playlist-edit</v-icon>修改备注
+          </v-btn>
+          <v-btn color="red" dark class="mx-2 mb-4" @click="remove(item)"> <v-icon left>mdi-delete</v-icon>删除设备 </v-btn>
+          <v-spacer></v-spacer>
+        </v-card-actions>
+      </v-card>
+    </div>
   </div>
 </template>
 
