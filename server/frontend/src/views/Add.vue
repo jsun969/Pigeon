@@ -129,17 +129,18 @@
               @update:error="isEditingError = $event"
             ></v-text-field>
             <div id="editing-name-operation" class="d-flex flex-column">
-              <v-btn dark small color="red" @click="stopEditingDevice({ index })" class="mb-1">
-                取消
-              </v-btn>
               <v-btn
                 :dark="!(isEditingError || item.editingName === item.name)"
                 small
                 color="green"
                 @click="confirmEdit(item, index)"
                 :disabled="isEditingError || item.editingName === item.name"
+                class="mb-1"
               >
                 确定
+              </v-btn>
+              <v-btn dark small color="red" @click="stopEditingDevice({ index })">
+                取消
               </v-btn>
             </div>
           </div>
