@@ -16,6 +16,9 @@
         v-if="$vuetify.breakpoint.name !== 'xs' && this.isLogin"
       ></v-app-bar-nav-icon>
       <v-toolbar-title>飞鸽传书</v-toolbar-title>
+      <v-btn icon @click="github" class="ml-5">
+        <v-icon>mdi-github</v-icon>
+      </v-btn>
       <v-spacer></v-spacer>
       <span v-if="this.isLogin">欢迎您 , {{ this.userFullName }}老师</span>
     </v-app-bar>
@@ -83,6 +86,9 @@ export default {
     ],
   }),
   methods: {
+    github() {
+      window.open('https://github.com/jsun969/Pigeon');
+    },
     closeDialog() {
       this.hideDialog();
       const { value } = this.dialog;

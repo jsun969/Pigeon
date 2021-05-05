@@ -92,7 +92,7 @@
 
     <div id="PC" v-else class="ma-6 d-flex flex-wrap">
       <v-card height="320" width="350" class="ma-5 px-6" outlined>
-        <v-card-title class="display-1 mt-3"><v-spacer></v-spacer>添加设备<v-spacer></v-spacer></v-card-title>
+        <v-card-title class="display-1 mt-3"><v-spacer></v-spacer>新设备<v-spacer></v-spacer></v-card-title>
         <v-text-field
           v-model="newCode"
           label="设备代码"
@@ -157,10 +157,18 @@
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn color="cyan" dark class="mx-2 mb-4" @click="startEditingDevice({ index })">
+          <v-btn
+            color="cyan"
+            :dark="!item.editing && item.status !== 2"
+            class="mx-2 mb-4"
+            @click="startEditingDevice({ index })"
+            :disabled="item.editing || item.status === 2"
+          >
             <v-icon left>mdi-playlist-edit</v-icon>修改备注
           </v-btn>
-          <v-btn color="red" dark class="mx-2 mb-4" @click="remove(item)"> <v-icon left>mdi-delete</v-icon>删除设备 </v-btn>
+          <v-btn color="red" :dark="item.status !== 2" class="mx-2 mb-4" @click="remove(item)" :disabled="item.status === 2">
+            <v-icon left>mdi-delete</v-icon>删除设备
+          </v-btn>
           <v-spacer></v-spacer>
         </v-card-actions>
       </v-card>
@@ -214,11 +222,7 @@ export default {
       this.setDeviceName({ index, newName: item.editingName });
       this.stopEditingDevice({ index });
       try {
-        const { status } =
-          (await axios.patch('/device/remarkName', { code: this.devices[index].code, name: item.editingName })) || {};
-        if (status === 200) {
-          console.log('change succeed');
-        }
+        await axios.patch('/device/remarkName', { code: this.devices[index].code, name: item.editingName });
       } catch {
         return;
       }
