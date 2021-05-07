@@ -66,11 +66,7 @@ export default new Vuex.Store({
       state.devices[state.devices.findIndex(({ code: codeTmp }) => codeTmp === code)].status = 1;
     },
   },
-  getters: {
-    onlineDevicesName: state => {
-      return state.devices.filter(({ status }) => status === 0).map(({ name }) => name);
-    },
-  },
+  getters: {},
   actions: {},
   modules: {},
 });

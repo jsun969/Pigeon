@@ -9,6 +9,17 @@
           <v-list-item-title>{{ item.text }}</v-list-item-title>
         </v-list-item>
       </v-list>
+      <template v-slot:append>
+        <div class="pa-2">
+          <v-btn icon v-if="drawer" @click="showDialog({ value: 'Logout', style: 2, text: '确定退出当前帐号?' })">
+            <v-icon>mdi-logout</v-icon>
+          </v-btn>
+          <v-btn block color="primary" v-else @click="showDialog({ value: 'Logout', style: 2, text: '确定退出当前帐号?' })">
+            <v-icon left>mdi-logout</v-icon>
+            退出登录
+          </v-btn>
+        </div>
+      </template>
     </v-navigation-drawer>
     <v-app-bar app color="primary" dark clipped-left>
       <v-app-bar-nav-icon
@@ -113,7 +124,7 @@ export default {
     refuseCloseDialog() {
       this.hideDialog();
     },
-    ...mapMutations(['hideDialog', 'userLogin', 'setFullName', 'removeDevice', 'getAllDevices']),
+    ...mapMutations(['hideDialog', 'userLogin', 'setFullName', 'removeDevice', 'getAllDevices','showDialog']),
   },
   computed: {
     btmNav() {

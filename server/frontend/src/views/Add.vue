@@ -1,6 +1,6 @@
 <template>
   <div class="add">
-    <div id="mobile" v-if="$vuetify.breakpoint.name == 'xs'">
+    <div id="mobile" v-if="$vuetify.breakpoint.name === 'xs'">
       <v-container>
         <v-row class="mt-2 mb-n9">
           <v-col>
