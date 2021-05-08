@@ -27,6 +27,7 @@
           <v-card-title>空</v-card-title>
           <v-card-text>
             还不知道写点啥
+            <v-btn color="pink" dark @click="popUp">TEST POPUP</v-btn>
           </v-card-text>
         </v-card>
       </v-col>
@@ -34,12 +35,15 @@
   </v-container>
 </template>
 <script>
-import { mapState } from 'vuex';
+import { mapState, mapMutations } from 'vuex';
 
 export default {
   name: 'Status',
   computed: {
     ...mapState(['code']),
+  },
+  methods: {
+    ...mapMutations(['popUp']),
   },
 };
 </script>

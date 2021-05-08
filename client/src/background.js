@@ -36,6 +36,33 @@ async function createWindow() {
   }
 }
 
+let popUpWin;
+async function createPopUpWindow({ width, height }) {
+  popUpWin = new BrowserWindow({
+    width,
+    height,
+    resizable: false,
+    frame: false,
+    webPreferences: {
+      // Use pluginOptions.nodeIntegration, leave this alone
+      // See nklayman.github.io/vue-cli-plugin-electron-builder/guide/security.html#node-integration for more info
+      nodeIntegration: process.env.ELECTRON_NODE_INTEGRATION,
+      enableRemoteModule: true,
+    },
+  });
+  if (process.env.WEBPACK_DEV_SERVER_URL) {
+    // Load the url of the dev server if in development mode
+    await popUpWin.loadURL(process.env.WEBPACK_DEV_SERVER_URL + 'popup');
+  } else {
+    createProtocol('app');
+    // Load the index.html when not in development
+    await popUpWin.loadURL('app://./popup.html');
+  }
+  popUpWin.on('close', () => {
+    popUpWin = null;
+  });
+}
+
 // Quit when all windows are closed.
 app.on('window-all-closed', () => {
   // On macOS it is common for applications and their menu bar
@@ -65,8 +92,12 @@ app.on('ready', async () => {
   }
   createWindow();
   // 发送设备代码
-  ipcMain.on('getPcId', async (event, arg) => {
+  ipcMain.on('getPcId', async event => {
     event.returnValue = await machineId();
+  });
+  // 打开弹窗
+  ipcMain.on('createPopUp', (event, { width, height }) => {
+    createPopUpWindow({ width, height });
   });
 });
 

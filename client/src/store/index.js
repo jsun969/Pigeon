@@ -9,7 +9,11 @@ export default new Vuex.Store({
   state: {
     code: null,
   },
-  mutations: {},
+  mutations: {
+    popUp(state, payload) {
+      ipcRenderer.send('createPopUp', { width: payload.width, height: payload.height });
+    },
+  },
   actions: {
     async getCode() {
       try {
