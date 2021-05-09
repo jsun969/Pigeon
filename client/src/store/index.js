@@ -1,16 +1,24 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
 import axios from 'axios';
+import createPersistedState from 'vuex-persistedstate';
 import { ipcRenderer } from 'electron';
 
 Vue.use(Vuex);
 
 export default new Vuex.Store({
+  plugins: [createPersistedState()],
   state: {
     code: null,
+    popUp: {
+      from: null,
+      message: null,
+    },
   },
   mutations: {
     popUp(state, payload) {
+      state.popUp.from = payload.from;
+      state.popUp.message = payload.message;
       ipcRenderer.send('createPopUp', { width: payload.width, height: payload.height });
     },
   },
