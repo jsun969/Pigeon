@@ -13,6 +13,8 @@ export default new Vuex.Store({
     popUp: {
       from: null,
       message: null,
+      // 弹窗关闭返回给服务器 待完善
+      // windows: {},
     },
   },
   mutations: {
@@ -20,7 +22,15 @@ export default new Vuex.Store({
       state.popUp.from = payload.from;
       state.popUp.message = payload.message;
       ipcRenderer.send('createPopUp', { width: payload.width, height: payload.height });
+      // 弹窗关闭返回给服务器 待完善
+      // ipcRenderer.on('pop-up-window-id', (event, arg) => {
+      //   state.popUp.windows[arg] = payload.id;
+      // });
     },
+    // 弹窗关闭返回给服务器 待完善
+    // popUpWindowClosed(state, payload) {
+    //   this._vm.$socket.client.emit('messageClosed', { id: state.popUp.windows[payload.id] });
+    // },
   },
   actions: {
     async getCode() {

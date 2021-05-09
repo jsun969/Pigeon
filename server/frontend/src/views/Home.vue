@@ -17,7 +17,7 @@
           elevation="2"
           large
           :block="$vuetify.breakpoint.name === 'xs'"
-          :disabled="msg.length > 100 || msg === '' || selectDevice === []"
+          :disabled="msg.length > 100 || msg === '' || selectDevices === []"
           @click="sendMessage"
           >发送</v-btn
         >

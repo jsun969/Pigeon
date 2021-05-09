@@ -33,6 +33,7 @@ module.exports = app;
 // Socket通讯相关 无法放在路由文件中 以后会改
 const User = require('./models/user');
 const Device = require('./models/device');
+const Message = require('./models/message');
 
 const io = require('socket.io')(server, {
   cors: {
@@ -140,7 +141,20 @@ io.on('connection', socket => {
   socket.on('sendMessage', async ({ auth, codes, message }) => {
     const { userId } = jwt.verify(auth, cfg.token.secret);
     const { username, fullName } = await User.findById(userId);
-    socket.to(codes).emit('sendMessageToDevice', { message, from: fullName });
-    console.log(`User [ ${username} ] send [ ${message} ] to [ ${codes} ]`);
+    const messagedb = new Message({
+      time: Date.now(),
+      username,
+      devices: codes,
+      message,
+      // status: true,
+    });
+    const { _id: id } = await messagedb.save();
+    socket.to(codes).emit('sendMessageToDevice', { message, from: fullName, id });
+    console.log(`User [ ${username} ] send [ ${message} ] to [ ${codes} ] with id [ ${id} ]`);
   });
+  // 消息被关闭 待完善
+  // socket.on('messageClosed', async ({ id }) => {
+  //   console.log(id);
+  //   console.log(await Message.findById(id));
+  // });
 });

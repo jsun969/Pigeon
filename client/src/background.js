@@ -43,6 +43,7 @@ async function createPopUpWindow({ width, height }) {
     height,
     resizable: false,
     frame: false,
+    alwaysOnTop: true,
     webPreferences: {
       // Use pluginOptions.nodeIntegration, leave this alone
       // See nklayman.github.io/vue-cli-plugin-electron-builder/guide/security.html#node-integration for more info
@@ -98,6 +99,8 @@ app.on('ready', async () => {
   // 打开弹窗
   ipcMain.on('createPopUp', (event, { width, height }) => {
     createPopUpWindow({ width, height });
+    // 弹窗关闭返回给服务器 待完善
+    // event.reply('pop-up-window-id', popUpWin.id);
   });
 });
 

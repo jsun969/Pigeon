@@ -58,7 +58,6 @@ export default {
       this.$socket.client.emit('deviceCreated', { code: this.code });
     },
     sendMessageToDevice({ message, from }) {
-      console.log(message, from);
       const isChinesePunctuation = /[\u3002\uff1b\uff0c\uff1a\uff08\uff09\u3001\uff1f\u300a\u300b\u2014\uff01\u3010\u3011\u2026]/;
       const isChinese = /^(?:[\u3400-\u4DB5\u4E00-\u9FEA\uFA0E\uFA0F\uFA11\uFA13\uFA14\uFA1F\uFA21\uFA23\uFA24\uFA27-\uFA29]|[\uD840-\uD868\uD86A-\uD86C\uD86F-\uD872\uD874-\uD879][\uDC00-\uDFFF]|\uD869[\uDC00-\uDED6\uDF00-\uDFFF]|\uD86D[\uDC00-\uDF34\uDF40-\uDFFF]|\uD86E[\uDC00-\uDC1D\uDC20-\uDFFF]|\uD873[\uDC00-\uDEA1\uDEB0-\uDFFF]|\uD87A[\uDC00-\uDFE0])+$/;
       let msgLength = 0;
@@ -71,6 +70,8 @@ export default {
         height: 35 + Math.ceil(msgLength / 1000) * 150,
         from,
         message,
+        // 弹窗关闭返回给服务器 待完善
+        // id,
       });
     },
   },
@@ -85,7 +86,7 @@ export default {
       shell.openExternal('https://github.com/jsun969/Pigeon');
     },
     ...mapActions(['getCode']),
-    ...mapMutations(['popUp'])
+    ...mapMutations(['popUp']),
   },
   computed: { ...mapState(['code']) },
 };

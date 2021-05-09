@@ -24,8 +24,11 @@ export default {
   name: 'Popup',
   methods: {
     close() {
+      // 弹窗关闭返回给服务器 待完善
+      // this.popUpWindowClosed({ id: remote.getCurrentWindow().id });
       remote.getCurrentWindow().close();
     },
+    // ...mapMutations(['popUpWindowClosed']),
   },
   computed: {
     ...mapState(['popUp']),
