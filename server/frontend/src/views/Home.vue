@@ -5,7 +5,7 @@
         <v-autocomplete
           chips
           deletable-chips
-          v-model="selectDevice"
+          v-model="selectDevices"
           :items="devices.filter(({ status }) => status === 0).map(({ name }) => name)"
           label="班级"
           no-data-text="无符合班级"
@@ -18,6 +18,7 @@
           large
           :block="$vuetify.breakpoint.name === 'xs'"
           :disabled="msg.length > 100 || msg === '' || selectDevice === []"
+          @click="sendMessage"
           >发送</v-btn
         >
       </div>
@@ -26,14 +27,29 @@
 </template>
 
 <script>
-import { mapState } from 'vuex';
+import { mapState, mapMutations } from 'vuex';
 
 export default {
   name: 'Home',
   data: () => ({
-    selectDevice: [],
+    selectDevices: [],
     msg: '',
   }),
+  methods: {
+    sendMessage() {
+      const selectDeviceCodes = this.devices
+        .filter(({ name }) => this.selectDevices.some(item => item === name))
+        .map(({ code }) => code);
+      this.$socket.client.emit('sendMessage', {
+        auth: localStorage.getItem('userToken'),
+        codes: selectDeviceCodes,
+        message: this.msg,
+      });
+      this.msg = '';
+      this.showDialog({ value: 'SendSuccess', style: 0, text: '发送成功' });
+    },
+    ...mapMutations(['showDialog']),
+  },
   computed: {
     ...mapState(['devices']),
   },

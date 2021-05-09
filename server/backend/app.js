@@ -135,4 +135,12 @@ io.on('connection', socket => {
     socket.to(code).emit('removeDeviceHotUpdate', { name: username });
     console.log(`User [ ${username} ] remove device [ ${code} ]`);
   });
+
+  // 发送消息
+  socket.on('sendMessage', async ({ auth, codes, message }) => {
+    const { userId } = jwt.verify(auth, cfg.token.secret);
+    const { username, fullName } = await User.findById(userId);
+    socket.to(codes).emit('sendMessageToDevice', { message, from: fullName });
+    console.log(`User [ ${username} ] send [ ${message} ] to [ ${codes} ]`);
+  });
 });
