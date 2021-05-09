@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="showDialog" width="300">
+  <v-dialog v-model="showDialog" width="300" @click:outside="clickOutside">
     <v-card>
       <v-card-title
         :class="{ headline: true, success: titleStyle === 0, error: titleStyle === 1, warning: titleStyle === 2 }"
@@ -38,6 +38,11 @@ export default {
     showDialog: Boolean,
     titleStyle: Number,
     mainText: String,
+  },
+  methods: {
+    clickOutside() {
+      this.$emit(this.titleStyle === 2 ? 'refuseClose' : 'close');
+    },
   },
 };
 </script>
