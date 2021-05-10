@@ -1,17 +1,28 @@
 <template>
   <v-container>
-    <v-card hover v-for="(item, index) in messagesRev" :key="index" class="ma-3">
-      <v-card-title>
-        <span>{{ item.fullName }}老师</span>
-        <v-spacer></v-spacer>
-        <span class="subtitle-2">{{ formattedTime(item.time) }}</span>
-      </v-card-title>
-      <v-card-text>{{ item.message }}</v-card-text>
-    </v-card>
+    <div v-for="(item, index) in messagesRev" :key="index" class="ma-3">
+      <v-lazy
+        v-model="item.isActive"
+        :options="{
+          threshold: 0.5,
+        }"
+        min-height="100"
+        transition="fade-transition"
+      >
+        <v-card hover>
+          <v-card-title>
+            <span>{{ item.fullName }}老师</span>
+            <v-spacer></v-spacer>
+            <span class="subtitle-2">{{ formattedTime(item.time) }}</span>
+          </v-card-title>
+          <v-card-text>{{ item.message }}</v-card-text>
+        </v-card>
+      </v-lazy>
+    </div>
   </v-container>
 </template>
 <script>
-import {  mapGetters } from 'vuex';
+import { mapGetters } from 'vuex';
 
 export default {
   name: 'History',
@@ -34,7 +45,7 @@ export default {
     },
   },
   computed: {
-    ...mapGetters(['messagesRev'])
+    ...mapGetters(['messagesRev']),
   },
 };
 </script>
