@@ -16,9 +16,11 @@ export default new Vuex.Store({
       // 弹窗关闭返回给服务器 待完善
       // windows: {},
     },
+    messages: [],
   },
   mutations: {
     popUp(state, payload) {
+      state.messages.push({ fullName: payload.from, message: payload.message, time: Date.now() });
       state.popUp.from = payload.from;
       state.popUp.message = payload.message;
       ipcRenderer.send('createPopUp', { width: payload.width, height: payload.height });
@@ -46,6 +48,19 @@ export default new Vuex.Store({
         this.state.code = '网络错误';
       }
     },
+    async getMessages() {
+      try {
+        const { status, data } = (await axios.get('/device/messages', { params: { code: this.state.code } })) || {};
+        if (status === 200) {
+          this.state.messages = data;
+        }
+      } catch {
+        return;
+      }
+    },
   },
   modules: {},
+  getters: {
+    messagesRev: state => state.messages.reverse(),
+  },
 });

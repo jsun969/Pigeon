@@ -46,6 +46,7 @@ export default {
   },
   mounted() {
     this.getCode();
+    this.getMessages();
   },
   beforeDestroy() {
     this.$socket.client.emit('deviceDestroy', { code: this.code });
@@ -85,10 +86,10 @@ export default {
     github() {
       shell.openExternal('https://github.com/jsun969/Pigeon');
     },
-    ...mapActions(['getCode']),
+    ...mapActions(['getCode', 'getMessages']),
     ...mapMutations(['popUp']),
   },
-  computed: { ...mapState(['code']) },
+  computed: { ...mapState(['code','messages']) },
 };
 </script>
 

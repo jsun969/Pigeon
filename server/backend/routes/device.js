@@ -8,7 +8,7 @@ const router = express.Router();
 
 const User = require('../models/user');
 const Device = require('../models/device');
-const { log } = require('console');
+const Message = require('../models/message');
 
 // 获取设备代号
 router.get('/code', async (req, res) => {
@@ -63,6 +63,26 @@ router.patch('/remarkName', async (req, res) => {
     await User.updateOne({ _id: userId, 'devices.code': req.body.code }, { $set: { 'devices.$.name': req.body.name } });
     console.log(`User [ ${username} ] modify Device [ ${req.body.code} ] name to [ ${req.body.name} ]`);
     res.sendStatus(200);
+  } catch (error) {
+    console.error(error);
+    res.sendStatus(500);
+  }
+});
+
+// 获取设备历史消息
+router.get('/messages', async (req, res) => {
+  try {
+    const messageDocs = await Message.find();
+    res.json(
+      messageDocs
+        .filter(({ devices }) => devices.includes(req.query.code))
+        .map(({ time, fullName, message }) => ({
+          time,
+          fullName,
+          message,
+        }))
+    );
+    console.log(`Device [ ${req.query.code} ] get all messages successfully!`);
   } catch (error) {
     console.error(error);
     res.sendStatus(500);

@@ -143,6 +143,7 @@ io.on('connection', socket => {
     const { username, fullName } = await User.findById(userId);
     const messagedb = new Message({
       time: Date.now(),
+      fullName,
       username,
       devices: codes,
       message,
