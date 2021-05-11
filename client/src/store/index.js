@@ -52,5 +52,6 @@ export default new Vuex.Store({
   modules: {},
   getters: {
     messagesRev: state => state.messages.map(item => ({ ...item, isActive: false })).reverse(),
+    messagesCnt: state => state.messages.length,
   },
 });
