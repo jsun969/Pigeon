@@ -1,18 +1,29 @@
 <template>
   <v-container>
-    <v-card elevation="4" v-for="(item, index) in messagesRev" :key="index" class="ma-4">
-      <v-card-title> 发送至{{ item.devices.toString() }} </v-card-title>
-      <v-card-text class="d-flex flex-column">
-        <span>{{ item.message }}</span>
-        <div class="d-flex justify-space-between mt-4">
-          <span :class="item.status ? 'green--text' : 'gray--text'">
-            <v-icon :color="item.status ? 'green' : 'gray'">mdi-circle-medium</v-icon>
-            {{ item.status ? '显示中' : '已关闭' }}
-          </span>
-          <span>{{ formattedTime(item.time) }}</span>
-        </div>
-      </v-card-text>
-    </v-card>
+    <div v-for="(item, index) in messagesRev" :key="index" class="ma-4">
+      <v-lazy
+        v-model="item.isActive"
+        :options="{
+          threshold: 0.5,
+        }"
+        min-height="100"
+        transition="fade-transition"
+      >
+        <v-card elevation="4">
+          <v-card-title> 发送至{{ item.devices.toString() }} </v-card-title>
+          <v-card-text class="d-flex flex-column">
+            <span>{{ item.message }}</span>
+            <div class="d-flex justify-space-between mt-4">
+              <span :class="item.status ? 'green--text' : 'gray--text'">
+                <v-icon :color="item.status ? 'green' : 'gray'">mdi-circle-medium</v-icon>
+                {{ item.status ? '显示中' : '已关闭' }}
+              </span>
+              <span>{{ formattedTime(item.time) }}</span>
+            </div>
+          </v-card-text>
+        </v-card>
+      </v-lazy>
+    </div>
   </v-container>
 </template>
 

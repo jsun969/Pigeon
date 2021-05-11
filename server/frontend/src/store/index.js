@@ -72,7 +72,8 @@ export default new Vuex.Store({
     },
   },
   getters: {
-    messagesRev: state => state.messages.map(item => ({ ...item, isActive: false })).reverse(),
+    messagesRev: state =>
+      state.messages.map((item, index, arr) => ({ ...item, isActive: index >= arr.length - 10 ? true : false })).reverse(),
   },
   actions: {
     async getHistoryMessages() {
