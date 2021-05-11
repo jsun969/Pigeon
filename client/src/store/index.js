@@ -13,8 +13,6 @@ export default new Vuex.Store({
     popUp: {
       from: null,
       message: null,
-      // 弹窗关闭返回给服务器 待完善
-      // windows: {},
     },
     messages: [],
   },
@@ -23,16 +21,8 @@ export default new Vuex.Store({
       state.messages.push({ fullName: payload.from, message: payload.message, time: Date.now() });
       state.popUp.from = payload.from;
       state.popUp.message = payload.message;
-      ipcRenderer.send('createPopUp', { width: payload.width, height: payload.height });
-      // 弹窗关闭返回给服务器 待完善
-      // ipcRenderer.on('pop-up-window-id', (event, arg) => {
-      //   state.popUp.windows[arg] = payload.id;
-      // });
+      ipcRenderer.send('createPopUp', { width: payload.width, height: payload.height, id: payload.id });
     },
-    // 弹窗关闭返回给服务器 待完善
-    // popUpWindowClosed(state, payload) {
-    //   this._vm.$socket.client.emit('messageClosed', { id: state.popUp.windows[payload.id] });
-    // },
   },
   actions: {
     async getCode() {
@@ -61,6 +51,6 @@ export default new Vuex.Store({
   },
   modules: {},
   getters: {
-    messagesRev: state => state.messages.reverse(),
+    messagesRev: state => state.messages.map(item => ({ ...item, isActive: false })).reverse(),
   },
 });

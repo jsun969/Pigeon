@@ -1,5 +1,6 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
+import axios from 'axios';
 
 Vue.use(Vuex);
 
@@ -11,6 +12,7 @@ export default new Vuex.Store({
     // 确定弹窗后修改前端新姓名的一个临时的全局变量 还没找到别的方法
     newFullNameWhenChange: null,
     devices: [],
+    messages: [],
   },
   mutations: {
     userLogin(state, payload) {
@@ -58,6 +60,9 @@ export default new Vuex.Store({
         state.devices = devices.map(({ code, name, status }) => ({ code, name, status, editing: false, editingName: '' }));
       });
     },
+    makeStatusTrue(state, payload) {
+      state.messages[state.messages.findIndex(({ time }) => time === payload.time)].status = false;
+    },
     // SocketIO
     SOCKET_DEVICEONLINE(state, { code }) {
       state.devices[state.devices.findIndex(({ code: codeTmp }) => codeTmp === code)].status = 0;
@@ -66,7 +71,20 @@ export default new Vuex.Store({
       state.devices[state.devices.findIndex(({ code: codeTmp }) => codeTmp === code)].status = 1;
     },
   },
-  getters: {},
-  actions: {},
+  getters: {
+    messagesRev: state => state.messages.map(item => ({ ...item, isActive: false })).reverse(),
+  },
+  actions: {
+    async getHistoryMessages() {
+      try {
+        const { status, data } = (await axios.get('/user/messages')) || {};
+        if (status === 200) {
+          this.state.messages = data;
+        }
+      } catch {
+        return;
+      }
+    },
+  },
   modules: {},
 });

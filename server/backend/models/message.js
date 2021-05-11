@@ -6,7 +6,7 @@ const messageSchema = mongoose.Schema({
   fullName: String,
   devices: [String],
   message: String,
-  // status: Boolean,
+  status: Boolean,
 });
 
 module.exports = mongoose.model('message', messageSchema);

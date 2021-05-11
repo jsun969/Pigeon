@@ -18,17 +18,21 @@
 
 <script>
 import { mapState } from 'vuex';
-import { remote } from 'electron';
+import { remote, ipcRenderer } from 'electron';
 
 export default {
   name: 'Popup',
+  data: () => ({
+    databaseID: null,
+  }),
+  mounted() {
+    this.databaseID = ipcRenderer.sendSync('getDatabaseID');
+  },
   methods: {
     close() {
-      // 弹窗关闭返回给服务器 待完善
-      // this.popUpWindowClosed({ id: remote.getCurrentWindow().id });
+      this.$socket.client.emit('messageClosed', { id: this.databaseID });
       remote.getCurrentWindow().close();
     },
-    // ...mapMutations(['popUpWindowClosed']),
   },
   computed: {
     ...mapState(['popUp']),

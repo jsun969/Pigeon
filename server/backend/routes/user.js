@@ -8,6 +8,7 @@ const router = express.Router();
 
 const InviteCode = require('../models/inviteCode');
 const User = require('../models/user');
+const Message = require('../models/message');
 
 // 生成邀请码 请求格式应为/?count=<个数>
 router.put('/invite-codes', async (req, res) => {
@@ -152,6 +153,29 @@ router.patch('/full-name', async (req, res) => {
   } catch (error) {
     res.status(500).send({ error });
     console.error(error);
+  }
+});
+
+// 获取历史消息
+router.get('/messages', async (req, res) => {
+  try {
+    const { userId } = jwt.verify(req.headers.auth, cfg.token.secret);
+    const { username } = await User.findById(userId);
+    const messageDocs = await Message.find();
+    res.json(
+      messageDocs
+        .filter(({ username: usernameTmp }) => username === usernameTmp)
+        .map(({ time, devices, message, status }) => ({
+          time,
+          devices,
+          message,
+          status,
+        }))
+    );
+    console.log(`User [ ${username} ] get all messages successfully!`);
+  } catch (error) {
+    console.error(error);
+    res.sendStatus(500);
   }
 });
 

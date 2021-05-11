@@ -97,10 +97,13 @@ app.on('ready', async () => {
     event.returnValue = await machineId();
   });
   // 打开弹窗
-  ipcMain.on('createPopUp', (event, { width, height }) => {
+  let databaseId;
+  ipcMain.on('createPopUp', (event, { width, height, id }) => {
     createPopUpWindow({ width, height });
-    // 弹窗关闭返回给服务器 待完善
-    // event.reply('pop-up-window-id', popUpWin.id);
+    databaseId = id;
+  });
+  ipcMain.on('getDatabaseID', event => {
+    event.returnValue = databaseId;
   });
 });
 

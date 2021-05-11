@@ -147,15 +147,16 @@ io.on('connection', socket => {
       username,
       devices: codes,
       message,
-      // status: true,
+      status: true,
     });
     const { _id: id } = await messagedb.save();
     socket.to(codes).emit('sendMessageToDevice', { message, from: fullName, id });
     console.log(`User [ ${username} ] send [ ${message} ] to [ ${codes} ] with id [ ${id} ]`);
   });
   // 消息被关闭 待完善
-  // socket.on('messageClosed', async ({ id }) => {
-  //   console.log(id);
-  //   console.log(await Message.findById(id));
-  // });
+  socket.on('messageClosed', async ({ id }) => {
+    const { message, time, username } = await Message.findByIdAndUpdate(id, { status: false });
+    socket.to(username).emit('messageClosedToUser', { time });
+    console.log(`Message [ ${message} ] is closed`);
+  });
 });
