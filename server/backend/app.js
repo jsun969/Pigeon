@@ -69,9 +69,15 @@ io.on('connection', socket => {
     if (onlineDevice.some(({ id }) => id === socket.id)) {
       console.log(`Device [ ${onlineDevice.find(({ id }) => id === socket.id).code} ] destroy`);
       const { users } = await Device.findOne({ code: onlineDevice.find(({ id }) => id === socket.id).code });
-      socket
-        .to(users.map(({ username }) => username))
-        .emit('deviceOffline', { code: onlineDevice.find(({ id }) => id === socket.id).code });
+      console.log(users);
+      if (!users.length) {
+        await Device.findOneAndRemove({ code: onlineDevice.find(({ id }) => id === socket.id).code });
+        console.log({ code: onlineDevice.find(({ id }) => id === socket.id).code });
+      } else {
+        socket
+          .to(users.map(({ username }) => username))
+          .emit('deviceOffline', { code: onlineDevice.find(({ id }) => id === socket.id).code });
+      }
       onlineDevice.splice(
         onlineDevice.findIndex(({ id }) => id === socket.id),
         1
@@ -153,7 +159,8 @@ io.on('connection', socket => {
     socket.to(codes).emit('sendMessageToDevice', { message, from: fullName, id });
     console.log(`User [ ${username} ] send [ ${message} ] to [ ${codes} ] with id [ ${id} ]`);
   });
-  // 消息被关闭 待完善
+
+  // 关闭消息
   socket.on('messageClosed', async ({ id }) => {
     const { message, time, username } = await Message.findByIdAndUpdate(id, { status: false });
     socket.to(username).emit('messageClosedToUser', { time });
