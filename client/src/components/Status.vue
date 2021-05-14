@@ -1,16 +1,16 @@
 <template>
   <v-container>
     <v-row>
-      <v-col cols="12">
+      <v-col cols="12" class="my-4">
         <v-card>
           <v-card-title>设备代码</v-card-title>
           <v-card-text class="display-4">
             {{ code }}
           </v-card-text>
-          <v-card-actions>
+          <!-- <v-card-actions>
             <v-spacer></v-spacer>
             <v-btn rounded outlined text> 刷新 <v-icon dark> mdi-reload </v-icon> </v-btn>
-          </v-card-actions>
+          </v-card-actions> -->
         </v-card>
       </v-col>
       <v-col cols="4">
@@ -24,9 +24,9 @@
       </v-col>
       <v-col cols="8">
         <v-card>
-          <v-card-title>空</v-card-title>
+          <v-card-title>关于</v-card-title>
           <v-card-text>
-            还不知道写点啥
+            写了但是没有完全写
           </v-card-text>
         </v-card>
       </v-col>

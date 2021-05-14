@@ -32,6 +32,16 @@
       </v-btn>
       <v-spacer></v-spacer>
       <span v-if="this.isLogin">欢迎您 , {{ this.userFullName }}老师</span>
+      <template v-slot:extension v-if="$vuetify.breakpoint.name === 'xs' && $route.name === 'Setting'">
+        <v-tabs v-model="tabs" show-arrows>
+          <v-tab v-for="(item, index) in settings.tabItems" :key="index">
+            <v-icon left>
+              {{ item.icon }}
+            </v-icon>
+            {{ item.text }}
+          </v-tab>
+        </v-tabs>
+      </template>
     </v-app-bar>
     <UserAuth v-if="!this.isLogin" />
     <v-main v-else>
@@ -124,13 +134,29 @@ export default {
     refuseCloseDialog() {
       this.hideDialog();
     },
-    ...mapMutations(['hideDialog', 'userLogin', 'setFullName', 'removeDevice', 'getAllDevices','showDialog']),
+    ...mapMutations([
+      'hideDialog',
+      'userLogin',
+      'setFullName',
+      'removeDevice',
+      'getAllDevices',
+      'showDialog',
+      'updateSettingsTabs',
+    ]),
   },
   computed: {
     btmNav() {
       return this.$route.name;
     },
-    ...mapState(['isLogin', 'userFullName', 'dialog', 'newFullNameWhenChange']),
+    tabs: {
+      get() {
+        return this.settings.tabs;
+      },
+      set(value) {
+        this.updateSettingsTabs(value);
+      },
+    },
+    ...mapState(['isLogin', 'userFullName', 'dialog', 'newFullNameWhenChange', 'settings']),
   },
 };
 </script>

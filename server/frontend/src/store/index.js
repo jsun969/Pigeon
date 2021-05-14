@@ -13,6 +13,15 @@ export default new Vuex.Store({
     newFullNameWhenChange: null,
     devices: [],
     messages: [],
+    settings: {
+      tabs: null,
+      tabItems: [
+        { icon: 'mdi-information', text: '关于项目' },
+        { icon: 'mdi-form-textbox-password', text: '修改密码' },
+        { icon: 'mdi-badge-account-horizontal', text: '修改姓名' },
+        { icon: 'mdi-compare', text: '切换主题' },
+      ],
+    },
   },
   mutations: {
     userLogin(state, payload) {
@@ -62,6 +71,9 @@ export default new Vuex.Store({
     },
     makeStatusTrue(state, payload) {
       state.messages[state.messages.findIndex(({ time }) => time === payload.time)].status = false;
+    },
+    updateSettingsTabs(state, value) {
+      state.settings.tabs = value;
     },
     // SocketIO
     SOCKET_DEVICEONLINE(state, { code }) {
