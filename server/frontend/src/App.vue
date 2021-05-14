@@ -32,6 +32,14 @@
       </v-btn>
       <v-spacer></v-spacer>
       <span v-if="this.isLogin">欢迎您 , {{ this.userFullName }}老师</span>
+      <v-btn
+        icon
+        @click="showDialog({ value: 'Logout', style: 2, text: '确定退出当前帐号?' })"
+        class="ml-5"
+        v-if="$vuetify.breakpoint.name === 'xs' && this.isLogin"
+      >
+        <v-icon>mdi-logout</v-icon>
+      </v-btn>
       <template v-slot:extension v-if="$vuetify.breakpoint.name === 'xs' && $route.name === 'Setting'">
         <v-tabs v-model="tabs" show-arrows>
           <v-tab v-for="(item, index) in settings.tabItems" :key="index">

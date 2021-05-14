@@ -1,6 +1,6 @@
 <template>
   <v-container>
-    <v-row align="center" justify="center" style="margin-top:8vh">
+    <v-row align="center" justify="center" class="mx-4 mt-16">
       <div style="width:80vw">
         <v-autocomplete
           chips
