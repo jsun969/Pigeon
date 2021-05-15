@@ -62,7 +62,7 @@ export default new Vuex.Store({
       );
     },
     setDeviceStatus(state, payload) {
-      state.devices[state.devices.findIndex(({ code }) => code === payload.code)].status = payload.status;
+      state.devices[state.devices.findIndex(({ code }) => code === payload.code.toString())].status = payload.status;
     },
     getAllDevices(state) {
       this._vm.$socket.client.emit('getDevice', { auth: localStorage.getItem('userToken') }, devices => {

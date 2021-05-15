@@ -49,8 +49,9 @@ io.on('connection', socket => {
 
   // 设备上线
   socket.on('deviceCreated', async ({ code }) => {
-    socket.join(code);
-    onlineDevice.push({ code, id: socket.id });
+    const codeStr = code.toString();
+    socket.join(codeStr);
+    onlineDevice.push({ code: codeStr, id: socket.id });
     const { users } = await Device.findOne({ code });
     socket.to(users.map(({ username }) => username)).emit('deviceOnline', { code });
     console.log(`Device [ ${socket.id} ] created with code [ ${code} ]`);
@@ -69,10 +70,9 @@ io.on('connection', socket => {
     if (onlineDevice.some(({ id }) => id === socket.id)) {
       console.log(`Device [ ${onlineDevice.find(({ id }) => id === socket.id).code} ] destroy`);
       const { users } = await Device.findOne({ code: onlineDevice.find(({ id }) => id === socket.id).code });
-      console.log(users);
       if (!users.length) {
         await Device.findOneAndRemove({ code: onlineDevice.find(({ id }) => id === socket.id).code });
-        console.log({ code: onlineDevice.find(({ id }) => id === socket.id).code });
+        console.log(`Device [ ${onlineDevice.find(({ id }) => id === socket.id).code} ] destroy without user`);
       } else {
         socket
           .to(users.map(({ username }) => username))
@@ -89,7 +89,7 @@ io.on('connection', socket => {
   socket.on('addDevice', async ({ auth, code, remarkName }) => {
     const { userId } = jwt.verify(auth, cfg.token.secret);
     const { fullName, username } = await User.findById(userId);
-    socket.to(`${code}`).emit('deviceAddReq', { fullName, remarkName, auth, username });
+    socket.to(code).emit('deviceAddReq', { fullName, remarkName, auth, username });
     console.log(`User [ ${username} ] want to connect Device [ ${code} ]`);
   });
 
@@ -122,7 +122,7 @@ io.on('connection', socket => {
         }))
         .reverse()
     );
-    console.log(`User ${username} get devices successfully!`);
+    console.log(`User [ ${username} ] get devices successfully!`);
   });
 
   // 设备删除绑定用户
