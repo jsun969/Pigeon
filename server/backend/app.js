@@ -156,7 +156,7 @@ io.on('connection', socket => {
       status: true,
     });
     const { _id: id } = await messagedb.save();
-    socket.to(codes).emit('sendMessageToDevice', { message, from: fullName, id });
+    socket.to(codes).emit('sendMessageToDevice', { message, from: fullName, id, username });
     console.log(`User [ ${username} ] send [ ${message} ] to [ ${codes} ] with id [ ${id} ]`);
   });
 
@@ -165,5 +165,16 @@ io.on('connection', socket => {
     const { message, time, username } = await Message.findByIdAndUpdate(id, { status: false });
     socket.to(username).emit('messageClosedToUser', { time });
     console.log(`Message [ ${message} ] is closed`);
+  });
+
+  // 修改姓名
+  socket.on('changeFullName', async ({ auth, newFullName }) => {
+    const { userId } = jwt.verify(auth, cfg.token.secret);
+    const { username, devices } = await User.findById(userId);
+    await Message.updateMany({ username }, { fullName: newFullName });
+    await Device.updateMany({ 'users.username': username }, { $set: { 'users.$.fullName': newFullName } });
+    await User.findByIdAndUpdate(userId, { fullName: newFullName });
+    socket.to(devices.map(({ code }) => code)).emit('changeFullNameHotUpdate', { username, newFullName });
+    console.log(`User [ ${username} ] change full name successfully!`);
   });
 });

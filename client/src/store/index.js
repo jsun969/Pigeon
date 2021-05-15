@@ -18,10 +18,15 @@ export default new Vuex.Store({
   },
   mutations: {
     popUp(state, payload) {
-      state.messages.push({ fullName: payload.from, message: payload.message, time: Date.now() });
+      state.messages.push({ fullName: payload.from, message: payload.message, time: Date.now(), username: payload.username });
       state.popUp.from = payload.from;
       state.popUp.message = payload.message;
       ipcRenderer.send('createPopUp', { width: payload.width, height: payload.height, id: payload.id });
+    },
+    changeMessageFullName(state, payload) {
+      state.messages
+        .filter(({ username }) => username === payload.username)
+        .forEach(message => (message.fullName = payload.newFullName));
     },
   },
   actions: {

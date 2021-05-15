@@ -76,10 +76,11 @@ router.get('/messages', async (req, res) => {
     res.json(
       messageDocs
         .filter(({ devices }) => devices.includes(req.query.code))
-        .map(({ time, fullName, message }) => ({
+        .map(({ time, fullName, message, username }) => ({
           time,
           fullName,
           message,
+          username,
         }))
     );
     console.log(`Device [ ${req.query.code} ] get all messages successfully!`);

@@ -45,7 +45,7 @@
 </template>
 
 <script>
-import { mapState } from 'vuex';
+import { mapState, mapMutations } from 'vuex';
 import axios from 'axios';
 
 export default {
@@ -99,6 +99,10 @@ export default {
         1
       );
     },
+    changeFullNameHotUpdate({ username, newFullName }) {
+      this.changeMessageFullName({ username, newFullName });
+      this.users[this.users.findIndex(({ username: usernameTmp }) => username === usernameTmp)].fullName = newFullName;
+    },
   },
   methods: {
     confirmRemove(index) {
@@ -132,6 +136,7 @@ export default {
         userAuth: this.newUserAuth,
       });
     },
+    ...mapMutations(['changeMessageFullName']),
   },
   computed: {
     ...mapState(['code']),

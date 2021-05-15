@@ -142,20 +142,6 @@ router.patch('/password', async (req, res) => {
   }
 });
 
-// 修改姓名
-router.patch('/full-name', async (req, res) => {
-  try {
-    const { userId } = jwt.verify(req.headers.auth, cfg.token.secret);
-    await User.findByIdAndUpdate(userId, { fullName: req.body.newFullName });
-    const { username } = await User.findById(userId);
-    res.sendStatus(200);
-    console.log(`User [ ${username} ] change full name successfully.`);
-  } catch (error) {
-    res.status(500).send({ error });
-    console.error(error);
-  }
-});
-
 // 获取历史消息
 router.get('/messages', async (req, res) => {
   try {

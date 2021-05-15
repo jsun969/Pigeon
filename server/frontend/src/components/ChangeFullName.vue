@@ -24,7 +24,6 @@
 
 <script>
 import { mapState, mapMutations } from 'vuex';
-import axios from 'axios';
 
 export default {
   name: 'ChangeFullName',
@@ -45,23 +44,9 @@ export default {
   methods: {
     async changeFullName() {
       // 待做:确认是否修改姓名
-      try {
-        const { newFullName } = this;
-        const { status } = (await axios.patch('/user/full-name', { newFullName })) || {};
-        if (status === 200) {
-          this.setNewFullNameWhenChange({ fullName: this.newFullName });
-          this.showDialog({ value: 'ChangeFullNameSuccess', style: 0, text: '修改姓名成功' });
-        }
-      } catch ({
-        response: {
-          status,
-          data: { error },
-        },
-      }) {
-        if (status === 500) {
-          this.showDialog({ value: 'ServerError', style: 1, text: `服务器错误 , ${error.code}` });
-        }
-      }
+      this.$socket.client.emit('changeFullName', { auth: localStorage.getItem('userToken'), newFullName: this.newFullName });
+      this.setNewFullNameWhenChange({ fullName: this.newFullName });
+      this.showDialog({ value: 'ChangeFullNameSuccess', style: 0, text: '修改姓名成功' });
       this.newFullName = '';
     },
     ...mapMutations(['showDialog', 'setNewFullNameWhenChange']),
