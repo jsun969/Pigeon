@@ -19,7 +19,6 @@ export default new Vuex.Store({
         { icon: 'mdi-information', text: '关于项目' },
         { icon: 'mdi-form-textbox-password', text: '修改密码' },
         { icon: 'mdi-badge-account-horizontal', text: '修改姓名' },
-        { icon: 'mdi-compare', text: '切换主题' },
       ],
     },
   },

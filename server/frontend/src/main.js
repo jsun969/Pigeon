@@ -16,6 +16,8 @@ Vue.use(VueSocketIOExt, socket, { store });
 
 axios.defaults.baseURL = 'http://localhost:3000';
 
+document.title = '飞鸽传书';
+
 new Vue({
   vuetify,
   router,
