@@ -81,7 +81,7 @@ export default {
       remote.getCurrentWindow().minimize();
     },
     close() {
-      console.log('close');
+      remote.getCurrentWindow().hide();
     },
     github() {
       shell.openExternal('https://github.com/jsun969/Pigeon');

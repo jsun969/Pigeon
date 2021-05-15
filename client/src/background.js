@@ -1,18 +1,20 @@
 'use strict';
 
-import { app, protocol, BrowserWindow, ipcMain } from 'electron';
+import { app, protocol, BrowserWindow, ipcMain, Menu, Tray } from 'electron';
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib';
 import installExtension, { VUEJS_DEVTOOLS } from 'electron-devtools-installer';
 import { machineId } from 'node-machine-id';
+import path from 'path';
 
 const isDevelopment = process.env.NODE_ENV !== 'production';
 
 // Scheme must be registered before the app is ready
 protocol.registerSchemesAsPrivileged([{ scheme: 'app', privileges: { secure: true, standard: true } }]);
 
+let win;
 async function createWindow() {
   // Create the browser window.
-  const win = new BrowserWindow({
+  win = new BrowserWindow({
     width: 450,
     height: 520,
     resizable: false,
@@ -65,13 +67,13 @@ async function createPopUpWindow({ width, height }) {
 }
 
 // Quit when all windows are closed.
-app.on('window-all-closed', () => {
-  // On macOS it is common for applications and their menu bar
-  // to stay active until the user quits explicitly with Cmd + Q
-  if (process.platform !== 'darwin') {
-    app.quit();
-  }
-});
+// app.on('window-all-closed', () => {
+//   // On macOS it is common for applications and their menu bar
+//   // to stay active until the user quits explicitly with Cmd + Q
+//   if (process.platform !== 'darwin') {
+//     app.quit();
+//   }
+// });
 
 app.on('activate', () => {
   // On macOS it's common to re-create a window in the app when the
@@ -79,6 +81,7 @@ app.on('activate', () => {
   if (BrowserWindow.getAllWindows().length === 0) createWindow();
 });
 
+let tray = null;
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
@@ -91,17 +94,44 @@ app.on('ready', async () => {
       console.error('Vue Devtools failed to install:', e.toString());
     }
   }
+
+  // 显示系统托盘
+  tray = new Tray(path.join(__static, 'logo.png'));
+  const contextMenu = Menu.buildFromTemplate([
+    {
+      label: '显示主界面',
+      type: 'normal',
+      click: () => {
+        win.show();
+        win.focus();
+      },
+    },
+    {
+      label: '退出',
+      type: 'normal',
+      click: () => {
+        app.quit();
+      },
+    },
+  ]);
+  tray.setToolTip('飞鸽传书');
+  tray.setContextMenu(contextMenu);
+
   createWindow();
+
   // 发送设备代码
   ipcMain.on('getPcId', async event => {
     event.returnValue = await machineId();
   });
+
   // 打开弹窗
   let databaseId;
   ipcMain.on('createPopUp', (event, { width, height, id }) => {
     createPopUpWindow({ width, height });
     databaseId = id;
   });
+
+  // 获取弹窗的服务端ID
   ipcMain.on('getDatabaseID', event => {
     event.returnValue = databaseId;
   });
