@@ -30,27 +30,18 @@ export default new Vuex.Store({
     },
   },
   actions: {
-    async getCode() {
+    async getCodeAndMessages() {
       try {
         const {
           status,
-          data: { code },
-        } = (await axios.get('/device/code', { params: { pcId: ipcRenderer.sendSync('getPcId') } })) || {};
+          data: { code,messages },
+        } = (await axios.get('/device/code-and-messages', { params: { pcId: ipcRenderer.sendSync('getPcId') } })) || {};
         if (status === 200) {
           this.state.code = code;
+          this.state.messages = messages;
         }
       } catch {
         this.state.code = '网络错误';
-      }
-    },
-    async getMessages() {
-      try {
-        const { status, data } = (await axios.get('/device/messages', { params: { code: this.state.code } })) || {};
-        if (status === 200) {
-          this.state.messages = data;
-        }
-      } catch {
-        return;
       }
     },
   },

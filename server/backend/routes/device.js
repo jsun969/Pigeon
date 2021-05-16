@@ -11,13 +11,24 @@ const Device = require('../models/device');
 const Message = require('../models/message');
 
 // 获取设备代号
-router.get('/code', async (req, res) => {
+router.get('/code-and-messages', async (req, res) => {
   try {
     // 判断设备是否已注册
     const isPcIdDuplicate = await Device.findById(crypto.createHash('sha256').update(req.query.pcId).digest('hex'));
     if (isPcIdDuplicate) {
-      res.json({ code: isPcIdDuplicate.code });
-      console.log(`Device [ ${isPcIdDuplicate.code} ] open the client`);
+      const messageDocs = await Message.find();
+      res.json({
+        code: isPcIdDuplicate.code,
+        messages: messageDocs
+          .filter(({ devices }) => devices.includes(isPcIdDuplicate.code))
+          .map(({ time, fullName, message, username }) => ({
+            time,
+            fullName,
+            message,
+            username,
+          })),
+      });
+      console.log(`Device [ ${isPcIdDuplicate.code} ] open the client and get messages`);
     } else {
       // 创建新设备
       let isCodeDuplicate, code;
@@ -63,27 +74,6 @@ router.patch('/remarkName', async (req, res) => {
     await User.updateOne({ _id: userId, 'devices.code': req.body.code }, { $set: { 'devices.$.name': req.body.name } });
     console.log(`User [ ${username} ] modify Device [ ${req.body.code} ] name to [ ${req.body.name} ]`);
     res.sendStatus(200);
-  } catch (error) {
-    console.error(error);
-    res.sendStatus(500);
-  }
-});
-
-// 获取设备历史消息
-router.get('/messages', async (req, res) => {
-  try {
-    const messageDocs = await Message.find();
-    res.json(
-      messageDocs
-        .filter(({ devices }) => devices.includes(req.query.code))
-        .map(({ time, fullName, message, username }) => ({
-          time,
-          fullName,
-          message,
-          username,
-        }))
-    );
-    console.log(`Device [ ${req.query.code} ] get all messages successfully!`);
   } catch (error) {
     console.error(error);
     res.sendStatus(500);
