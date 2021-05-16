@@ -96,7 +96,8 @@ router.post('/login', async (req, res) => {
     });
     if (doc) {
       const token = jwt.sign({ userId: doc._id }, cfg.token.secret, { expiresIn: cfg.token.maxAge });
-      res.json({ token });
+      const { fullName } = await User.findById(doc._id);
+      res.json({ token, fullName });
       console.log(`User [ ${req.body.username} ] login successfully.`);
     } else {
       res.status(404).json({ error: 'LoginError' });

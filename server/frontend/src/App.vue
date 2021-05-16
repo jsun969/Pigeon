@@ -85,7 +85,6 @@ export default {
     Dialog,
   },
   async mounted() {
-    this.getAllDevices();
     try {
       const {
         status,

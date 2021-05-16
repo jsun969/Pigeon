@@ -125,7 +125,12 @@ export default {
     async register() {
       if (this.isRegBtnDisabled) return;
       try {
-        const { registerFullName: fullName, registerName: username, registerPwd1: password, registerInviteCode: inviteCode } = this;
+        const {
+          registerFullName: fullName,
+          registerName: username,
+          registerPwd1: password,
+          registerInviteCode: inviteCode,
+        } = this;
         const userData = { fullName, username, password, inviteCode };
         const { status } = (await axios.post('/user/register', userData)) || {};
         if (status === 201) {
@@ -158,10 +163,14 @@ export default {
       try {
         const { loginName: username, loginPwd: password } = this;
         const userData = { username, password };
-        const { status, data } = (await axios.post('/user/login', userData)) || {};
+        const {
+          status,
+          data: { token, fullName },
+        } = (await axios.post('/user/login', userData)) || {};
         if (status === 200) {
-          localStorage.setItem('userToken', data.token);
-          axios.defaults.headers.common['auth'] = data.token;
+          localStorage.setItem('userToken', token);
+          this.setFullName({ fullName });
+          axios.defaults.headers.common['auth'] = token;
           this.showDialog({ value: 'LoginSuccess', style: 0, text: '登陆成功' });
         }
       } catch ({
@@ -179,7 +188,7 @@ export default {
       this.loginName = '';
       this.loginPwd = '';
     },
-    ...mapMutations(['showDialog']),
+    ...mapMutations(['showDialog', 'setFullName']),
   },
 };
 </script>
