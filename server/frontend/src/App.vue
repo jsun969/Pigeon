@@ -88,12 +88,14 @@ export default {
     try {
       const {
         status,
-        data: { fullName },
+        data: { fullName, messages },
       } = (await axios.post('/user/token-verify', { auth: localStorage.getItem('userToken') })) || {};
       if (status === 200) {
         this.userLogin({ value: true });
         axios.defaults.headers.common['auth'] = localStorage.getItem('userToken');
         this.setFullName({ fullName });
+        this.setMessages({ messages });
+        this.getAllDevices();
       }
     } catch (error) {
       return;
@@ -149,6 +151,8 @@ export default {
       'getAllDevices',
       'showDialog',
       'updateSettingsTabs',
+      'getAllDevices',
+      'setMessages',
     ]),
   },
   computed: {

@@ -8,7 +8,7 @@
         {{ item.text }}
       </v-tab>
       <v-tab-item class="ma-6">
-        关于项目
+        <About />
       </v-tab-item>
       <v-tab-item class="ma-6">
         <ChangePassword />
@@ -19,7 +19,7 @@
     </v-tabs>
     <v-tabs-items v-model="tabs" v-else>
       <v-tab-item class="ma-6">
-        关于项目
+        <About />
       </v-tab-item>
       <v-tab-item class="ma-6">
         <ChangePassword />
@@ -35,12 +35,14 @@
 import { mapState, mapMutations } from 'vuex';
 import ChangeFullName from '../components/ChangeFullName';
 import ChangePassword from '../components/ChangePassword';
+import About from '../components/About';
 
 export default {
   name: 'Setting',
   components: {
     ChangeFullName,
     ChangePassword,
+    About,
   },
   methods: {
     ...mapMutations(['updateSettingsTabs']),

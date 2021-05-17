@@ -96,8 +96,20 @@ router.post('/login', async (req, res) => {
     });
     if (doc) {
       const token = jwt.sign({ userId: doc._id }, cfg.token.secret, { expiresIn: cfg.token.maxAge });
-      const { fullName } = await User.findById(doc._id);
-      res.json({ token, fullName });
+      const { fullName, username } = await User.findById(doc._id);
+      const messageDocs = await Message.find();
+      res.json({
+        token,
+        fullName,
+        messages: messageDocs
+          .filter(({ username: usernameTmp }) => username === usernameTmp)
+          .map(({ time, devices, message, status }) => ({
+            time,
+            devices,
+            message,
+            status,
+          })),
+      });
       console.log(`User [ ${req.body.username} ] login successfully.`);
     } else {
       res.status(404).json({ error: 'LoginError' });
@@ -114,7 +126,18 @@ router.post('/token-verify', async (req, res) => {
   try {
     const { userId } = jwt.verify(req.body.auth, cfg.token.secret);
     const { username, fullName } = await User.findById(userId);
-    res.json({ fullName });
+    const messageDocs = await Message.find();
+    res.json({
+      fullName,
+      messages: messageDocs
+        .filter(({ username: usernameTmp }) => username === usernameTmp)
+        .map(({ time, devices, message, status }) => ({
+          time,
+          devices,
+          message,
+          status,
+        })),
+    });
     console.log(`User [ ${username} ] login with token successfully.`);
   } catch (error) {
     res.status(403).send({ error });
@@ -140,29 +163,6 @@ router.patch('/password', async (req, res) => {
   } catch (error) {
     res.status(500).send({ error });
     console.error(error);
-  }
-});
-
-// 获取历史消息
-router.get('/messages', async (req, res) => {
-  try {
-    const { userId } = jwt.verify(req.headers.auth, cfg.token.secret);
-    const { username } = await User.findById(userId);
-    const messageDocs = await Message.find();
-    res.json(
-      messageDocs
-        .filter(({ username: usernameTmp }) => username === usernameTmp)
-        .map(({ time, devices, message, status }) => ({
-          time,
-          devices,
-          message,
-          status,
-        }))
-    );
-    console.log(`User [ ${username} ] get all messages successfully!`);
-  } catch (error) {
-    console.error(error);
-    res.sendStatus(500);
   }
 });
 

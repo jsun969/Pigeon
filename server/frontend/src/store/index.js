@@ -1,6 +1,5 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
-import axios from 'axios';
 
 Vue.use(Vuex);
 
@@ -74,6 +73,9 @@ export default new Vuex.Store({
     updateSettingsTabs(state, value) {
       state.settings.tabs = value;
     },
+    setMessages(state, payload) {
+      state.messages = payload.messages;
+    },
     // SocketIO
     SOCKET_DEVICEONLINE(state, { code }) {
       state.devices[state.devices.findIndex(({ code: codeTmp }) => codeTmp === code)].status = 0;
@@ -86,17 +88,6 @@ export default new Vuex.Store({
     messagesRev: state =>
       state.messages.map((item, index, arr) => ({ ...item, isActive: index >= arr.length - 10 ? true : false })).reverse(),
   },
-  actions: {
-    async getHistoryMessages() {
-      try {
-        const { status, data } = (await axios.get('/user/messages')) || {};
-        if (status === 200) {
-          this.state.messages = data;
-        }
-      } catch {
-        return;
-      }
-    },
-  },
+  actions: {},
   modules: {},
 });

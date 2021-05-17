@@ -165,12 +165,14 @@ export default {
         const userData = { username, password };
         const {
           status,
-          data: { token, fullName },
+          data: { token, fullName, messages },
         } = (await axios.post('/user/login', userData)) || {};
         if (status === 200) {
           localStorage.setItem('userToken', token);
           this.setFullName({ fullName });
           axios.defaults.headers.common['auth'] = token;
+          this.setMessages({ messages });
+          this.getAllDevices();
           this.showDialog({ value: 'LoginSuccess', style: 0, text: '登陆成功' });
         }
       } catch ({
@@ -188,7 +190,7 @@ export default {
       this.loginName = '';
       this.loginPwd = '';
     },
-    ...mapMutations(['showDialog', 'setFullName']),
+    ...mapMutations(['showDialog', 'setFullName', 'getAllDevices', 'setMessages']),
   },
 };
 </script>

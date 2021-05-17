@@ -182,9 +182,6 @@ import axios from 'axios';
 
 export default {
   name: 'Add',
-  mounted() {
-    this.getAllDevices();
-  },
   data: () => ({
     newCode: null,
     newName: '',
@@ -260,7 +257,6 @@ export default {
       'showDialog',
       'removeDevice',
       'setDeviceStatus',
-      'getAllDevices',
     ]),
   },
   computed: {

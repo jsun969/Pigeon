@@ -28,13 +28,10 @@
 </template>
 
 <script>
-import { mapActions, mapGetters, mapMutations } from 'vuex';
+import { mapGetters, mapMutations } from 'vuex';
 
 export default {
   name: 'History',
-  mounted() {
-    this.getHistoryMessages();
-  },
   computed: {
     ...mapGetters(['messagesRev']),
   },
@@ -60,7 +57,6 @@ export default {
         .padStart(2, '0')}`;
       return `${day} ${date} ${time}`;
     },
-    ...mapActions(['getHistoryMessages']),
     ...mapMutations(['makeStatusTrue']),
   },
 };
