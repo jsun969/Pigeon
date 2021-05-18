@@ -24,7 +24,7 @@
       </v-col>
       <v-col cols="8">
         <v-card>
-          <v-list-item three-line>
+          <v-list-item two-line>
             <v-list-item-content>
               <v-list-item-title class="title ">
                 关于
