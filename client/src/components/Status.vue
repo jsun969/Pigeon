@@ -32,7 +32,7 @@
               <v-list-item-text class="d-flex flex-column body-2 mt-2">
                 <span>作者: 荆棘Justin</span>
                 <span>项目已在Github开源</span>
-                <span>欢迎Srar&Fork</span>
+                <span>欢迎Star&Fork</span>
                 <span>如遇到问题可Issue</span>
                 <span>作者邮箱i@jsun969.cn</span>
               </v-list-item-text>
