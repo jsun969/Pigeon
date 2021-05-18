@@ -1,7 +1,7 @@
 <template>
   <v-container>
     <v-row>
-      <v-col cols="12" class="my-4">
+      <v-col cols="12" class="mt-4">
         <v-card>
           <v-card-title>设备代码</v-card-title>
           <v-card-text class="display-4">
@@ -24,10 +24,23 @@
       </v-col>
       <v-col cols="8">
         <v-card>
-          <v-card-title>关于</v-card-title>
-          <v-card-text>
-            写了但是没有完全写
-          </v-card-text>
+          <v-list-item three-line>
+            <v-list-item-content>
+              <v-list-item-title class="title ">
+                关于
+              </v-list-item-title>
+              <v-list-item-text class="d-flex flex-column body-2 mt-2">
+                <span>作者: 荆棘Justin</span>
+                <span>项目已在Github开源</span>
+                <span>欢迎Srar&Fork</span>
+                <span>如遇到问题可Issue</span>
+                <span>作者邮箱i@jsun969.cn</span>
+              </v-list-item-text>
+            </v-list-item-content>
+            <v-list-item-avatar tile size="80">
+              <img src="../assets/avatar.svg" alt="avatar" />
+            </v-list-item-avatar>
+          </v-list-item>
         </v-card>
       </v-col>
     </v-row>
