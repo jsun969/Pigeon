@@ -28,17 +28,12 @@
 </template>
 
 <script>
-import { mapGetters, mapMutations } from 'vuex';
+import { mapGetters } from 'vuex';
 
 export default {
   name: 'History',
   computed: {
     ...mapGetters(['messagesRev']),
-  },
-  sockets: {
-    messageClosedToUser({ time }) {
-      this.makeStatusTrue({ time });
-    },
   },
   methods: {
     formattedTime(timeTmp) {
@@ -57,7 +52,6 @@ export default {
         .padStart(2, '0')}`;
       return `${day} ${date} ${time}`;
     },
-    ...mapMutations(['makeStatusTrue']),
   },
 };
 </script>

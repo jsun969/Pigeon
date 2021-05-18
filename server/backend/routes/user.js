@@ -103,7 +103,8 @@ router.post('/login', async (req, res) => {
         fullName,
         messages: messageDocs
           .filter(({ username: usernameTmp }) => username === usernameTmp)
-          .map(({ time, devices, message, status }) => ({
+          .map(({ _id: id, time, devices, message, status }) => ({
+            id,
             time,
             devices,
             message,
@@ -131,7 +132,8 @@ router.post('/token-verify', async (req, res) => {
       fullName,
       messages: messageDocs
         .filter(({ username: usernameTmp }) => username === usernameTmp)
-        .map(({ time, devices, message, status }) => ({
+        .map(({ _id: id, time, devices, message, status }) => ({
+          id,
           time,
           devices,
           message,

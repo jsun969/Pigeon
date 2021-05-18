@@ -67,8 +67,9 @@ export default new Vuex.Store({
         state.devices = devices.map(({ code, name, status }) => ({ code, name, status, editing: false, editingName: '' }));
       });
     },
-    makeStatusTrue(state, payload) {
-      state.messages[state.messages.findIndex(({ time }) => time === payload.time)].status = false;
+    addMessageToHistory(state, payload) {
+      console.log(payload);
+      state.messages.push(payload);
     },
     updateSettingsTabs(state, value) {
       state.settings.tabs = value;
@@ -82,6 +83,9 @@ export default new Vuex.Store({
     },
     SOCKET_DEVICEOFFLINE(state, { code }) {
       state.devices[state.devices.findIndex(({ code: codeTmp }) => codeTmp === code)].status = 1;
+    },
+    SOCKET_MESSAGECLOSEDTOUSER(state, { id }) {
+      state.messages[state.messages.findIndex(({ id: idTmp }) => idTmp === id)].status = false;
     },
   },
   getters: {

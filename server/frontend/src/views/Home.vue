@@ -11,13 +11,13 @@
           no-data-text="无符合班级"
           multiple
         ></v-autocomplete>
-        <v-textarea outlined no-resize rows="5" label="信息" v-model="msg" counter="100"></v-textarea>
+        <v-textarea outlined no-resize rows="5" label="信息" v-model="message" counter="100"></v-textarea>
         <v-btn
           color="primary"
           elevation="2"
           large
           :block="$vuetify.breakpoint.name === 'xs'"
-          :disabled="msg.length > 100 || msg === '' || selectDevices === []"
+          :disabled="message.length > 100 || message === '' || selectDevices === []"
           @click="sendMessage"
           >发送</v-btn
         >
@@ -33,22 +33,29 @@ export default {
   name: 'Home',
   data: () => ({
     selectDevices: [],
-    msg: '',
+    message: '',
   }),
   methods: {
     sendMessage() {
-      const selectDeviceCodes = this.devices
+      const selectDevicesCodes = this.devices
         .filter(({ name }) => this.selectDevices.some(item => item === name))
         .map(({ code }) => code);
-      this.$socket.client.emit('sendMessage', {
-        auth: localStorage.getItem('userToken'),
-        codes: selectDeviceCodes,
-        message: this.msg,
-      });
-      this.msg = '';
+      const messageTmp = this.message;
+      this.$socket.client.emit(
+        'sendMessage',
+        {
+          auth: localStorage.getItem('userToken'),
+          codes: selectDevicesCodes,
+          message: messageTmp,
+        },
+        databaseData => {
+          this.addMessageToHistory({ ...databaseData, devices: selectDevicesCodes, message: messageTmp, status: true });
+        }
+      );
+      this.message = '';
       this.showDialog({ value: 'SendSuccess', style: 0, text: '发送成功' });
     },
-    ...mapMutations(['showDialog']),
+    ...mapMutations(['showDialog', 'addMessageToHistory']),
   },
   computed: {
     ...mapState(['devices']),

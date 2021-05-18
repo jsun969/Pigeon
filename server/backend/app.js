@@ -144,10 +144,10 @@ io.on('connection', socket => {
   });
 
   // 发送消息
-  socket.on('sendMessage', async ({ auth, codes, message }) => {
+  socket.on('sendMessage', async ({ auth, codes, message }, callbackDatabaseData) => {
     const { userId } = jwt.verify(auth, cfg.token.secret);
     const { username, fullName } = await User.findById(userId);
-    const messagedb = new Message({
+    const messageDatabase = new Message({
       time: Date.now(),
       fullName,
       username,
@@ -155,7 +155,8 @@ io.on('connection', socket => {
       message,
       status: true,
     });
-    const { _id: id } = await messagedb.save();
+    const { _id: id, time } = await messageDatabase.save();
+    callbackDatabaseData({ id, time });
     socket.to(codes).emit('sendMessageToDevice', { message, from: fullName, id, username });
     console.log(`User [ ${username} ] send [ ${message} ] to [ ${codes} ] with id [ ${id} ]`);
   });
@@ -163,7 +164,7 @@ io.on('connection', socket => {
   // 关闭消息
   socket.on('messageClosed', async ({ id }) => {
     const { message, time, username } = await Message.findByIdAndUpdate(id, { status: false });
-    socket.to(username).emit('messageClosedToUser', { time });
+    socket.to(username).emit('messageClosedToUser', { id });
     console.log(`Message [ ${message} ] is closed`);
   });
 
