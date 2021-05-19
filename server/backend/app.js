@@ -43,7 +43,8 @@ const io = require('socket.io')(server, {
 });
 
 // 在线设备缓存
-let onlineDevice = [];
+let onlineDevices = [];
+let onlineUsers = [];
 io.on('connection', socket => {
   console.log(`[ ${socket.id} ] connect`);
 
@@ -51,7 +52,7 @@ io.on('connection', socket => {
   socket.on('deviceCreated', async ({ code }) => {
     const codeStr = code.toString();
     socket.join(codeStr);
-    onlineDevice.push({ code: codeStr, id: socket.id });
+    onlineDevices.push({ code: codeStr, id: socket.id });
     const { users } = await Device.findOne({ code });
     socket.to(users.map(({ username }) => username)).emit('deviceOnline', { code });
     console.log(`Device [ ${socket.id} ] created with code [ ${code} ]`);
@@ -62,24 +63,30 @@ io.on('connection', socket => {
     const { userId } = jwt.verify(auth, cfg.token.secret);
     const { username } = await User.findById(userId);
     socket.join(username);
+    onlineUsers.push({ username, id: socket.id });
     console.log(`User [ ${socket.id} ] created with name [ ${username} ]`);
   });
 
   // 设备下线
   socket.on('disconnect', async () => {
-    if (onlineDevice.some(({ id }) => id === socket.id)) {
-      console.log(`Device [ ${onlineDevice.find(({ id }) => id === socket.id).code} ] destroy`);
-      const { users } = await Device.findOne({ code: onlineDevice.find(({ id }) => id === socket.id).code });
+    if (onlineDevices.some(({ id }) => id === socket.id)) {
+      console.log(`Device [ ${onlineDevices.find(({ id }) => id === socket.id).code} ] destroy`);
+      const { users } = await Device.findOne({ code: onlineDevices.find(({ id }) => id === socket.id).code });
       if (!users.length) {
-        await Device.findOneAndRemove({ code: onlineDevice.find(({ id }) => id === socket.id).code });
-        console.log(`Device [ ${onlineDevice.find(({ id }) => id === socket.id).code} ] destroy without user`);
+        await Device.findOneAndRemove({ code: onlineDevices.find(({ id }) => id === socket.id).code });
+        console.log(`Device [ ${onlineDevices.find(({ id }) => id === socket.id).code} ] destroy without user`);
       } else {
         socket
           .to(users.map(({ username }) => username))
-          .emit('deviceOffline', { code: onlineDevice.find(({ id }) => id === socket.id).code });
+          .emit('deviceOffline', { code: onlineDevices.find(({ id }) => id === socket.id).code });
       }
-      onlineDevice.splice(
-        onlineDevice.findIndex(({ id }) => id === socket.id),
+      onlineDevices.splice(
+        onlineDevices.findIndex(({ id }) => id === socket.id),
+        1
+      );
+    } else if (onlineUsers.some(({ id }) => id === socket.id)) {
+      onlineUsers.splice(
+        onlineUsers.findIndex(({ id }) => id === socket.id),
         1
       );
     }
@@ -118,7 +125,7 @@ io.on('connection', socket => {
         .map(({ code, name }) => ({
           code,
           name,
-          status: onlineDevice.some(({ code: codeTmp }) => codeTmp === code) ? 0 : 1,
+          status: onlineDevices.some(({ code: codeTmp }) => codeTmp === code) ? 0 : 1,
         }))
         .reverse()
     );
@@ -178,4 +185,64 @@ io.on('connection', socket => {
     socket.to(devices.map(({ code }) => code)).emit('changeFullNameHotUpdate', { username, newFullName });
     console.log(`User [ ${username} ] change full name successfully!`);
   });
+});
+
+// 控制台输入
+const readline = require('readline');
+const crypto = require('crypto');
+const rl = readline.createInterface({
+  input: process.stdin,
+  output: process.stdout,
+});
+
+const InviteCode = require('./models/inviteCode');
+
+rl.on('line', async input => {
+  console.log('##############################');
+  switch (input.split(' ')[0]) {
+    case 'gen-icode':
+      // 生成邀请码
+      const count = +input.split(' ')[1];
+      let randStrArr = [];
+      for (let i = 0; i < count; i++) {
+        let isInviteCodeDuplicate, randStr;
+        do {
+          randStr = crypto.randomBytes(20).toString('hex');
+          isInviteCodeDuplicate = await InviteCode.findById(randStr);
+        } while (isInviteCodeDuplicate);
+        const inviteCode = new InviteCode({
+          _id: randStr,
+          username: null,
+        });
+        await inviteCode.save();
+        randStrArr.push(randStr);
+      }
+      console.log(randStrArr);
+      break;
+    case 'get-icode':
+      // 获取邀请码
+      let docsArr = [];
+      const docs = await InviteCode.find();
+      if (input.split(' ')[1] === 'unused') {
+        docsArr = docs.filter(({ username }) => username === null).map(({ _id: code }) => code);
+      } else if (input.split(' ')[1] === 'used') {
+        docsArr = docs.filter(({ username }) => username !== null).map(({ _id: code }) => code);
+      } else {
+        docsArr = docs.map(({ _id: code, username }) => ({ code, username }));
+      }
+      console.log(docsArr);
+      break;
+    case 'user':
+      // 获取在线用户
+      console.log(onlineUsers.map(({ username }) => username));
+      break;
+    case 'device':
+      // 获取在线设备
+      console.log(onlineDevices.map(({ code }) => code));
+      break;
+    default:
+      console.log('Input not found');
+      break;
+  }
+  console.log('##############################');
 });

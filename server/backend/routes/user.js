@@ -6,48 +6,8 @@ const crypto = require('crypto');
 
 const router = express.Router();
 
-const InviteCode = require('../models/inviteCode');
 const User = require('../models/user');
 const Message = require('../models/message');
-
-// 生成邀请码 请求格式应为/?count=<个数>
-router.put('/invite-codes', async (req, res) => {
-  try {
-    let randStrArr = [];
-    for (let i = 0; i < req.query.count; i++) {
-      let isInviteCodeDuplicate, randStr;
-      do {
-        randStr = crypto.randomBytes(20).toString('hex');
-        isInviteCodeDuplicate = await InviteCode.findById(randStr);
-      } while (isInviteCodeDuplicate);
-      const inviteCode = new InviteCode({
-        _id: randStr,
-        username: null,
-      });
-      await inviteCode.save();
-      randStrArr.push(randStr);
-    }
-    res.json(randStrArr);
-    console.log(randStrArr);
-    console.log(`Generate ${req.query.count} invite codes successfully!`);
-  } catch (error) {
-    console.error(error);
-    res.status(500).send({ error });
-  }
-});
-
-// 获取所有邀请码及其注册用户名
-router.get('/invite-codes', async (req, res) => {
-  try {
-    const docs = await InviteCode.find();
-    const docsArr = docs.map(({ _id: code, username }) => ({ code, username }));
-    res.json(docsArr);
-    console.log('Get all invite codes successfully!');
-  } catch (error) {
-    res.status(500).send({ error });
-    console.error(error);
-  }
-});
 
 // 注册(屎山)
 router.post('/register', async (req, res) => {
