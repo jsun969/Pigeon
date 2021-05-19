@@ -30,11 +30,11 @@
                 关于
               </v-list-item-title>
               <v-list-item-text class="d-flex flex-column body-2 mt-2">
-                <span>作者: 荆棘Justin</span>
-                <span>项目已在Github开源</span>
+                <span>作者:<a @click="blog">荆棘Justin</a></span>
+                <span>项目已在<a @click="github">Github</a>开源</span>
                 <span>欢迎Star&Fork</span>
                 <span>如遇到问题可Issue</span>
-                <span>作者邮箱i@jsun969.cn</span>
+                <span>作者邮箱<a href="mailto:i@jsun969.cn">i@jsun969.cn</a></span>
               </v-list-item-text>
             </v-list-item-content>
             <v-list-item-avatar tile size="80">
@@ -48,9 +48,18 @@
 </template>
 <script>
 import { mapState, mapGetters } from 'vuex';
+import { shell } from 'electron';
 
 export default {
   name: 'Status',
+  methods: {
+    blog() {
+      shell.openExternal('https://jsun969.cn');
+    },
+    github() {
+      shell.openExternal('https://github.com/jsun969/Pigeon');
+    },
+  },
   computed: {
     ...mapState(['code']),
     ...mapGetters(['messagesCnt']),
