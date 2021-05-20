@@ -200,7 +200,7 @@ const InviteCode = require('./models/inviteCode');
 rl.on('line', async input => {
   console.log('##############################');
   switch (input.split(' ')[0]) {
-    case 'gen-icode':
+    case 'gen-icodes':
       // 生成邀请码
       const count = +input.split(' ')[1];
       let randStrArr = [];
@@ -219,7 +219,7 @@ rl.on('line', async input => {
       }
       console.log(randStrArr);
       break;
-    case 'get-icode':
+    case 'icodes':
       // 获取邀请码
       let docsArr = [];
       const docs = await InviteCode.find();

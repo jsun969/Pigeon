@@ -11,7 +11,7 @@ const Device = require('../models/device');
 const Message = require('../models/message');
 
 // 获取设备代号
-router.get('/code-and-messages', async (req, res) => {
+router.get('/data', async (req, res) => {
   try {
     // 判断设备是否已注册
     const isPcIdDuplicate = await Device.findById(crypto.createHash('sha256').update(req.query.pcId).digest('hex'));
@@ -27,6 +27,7 @@ router.get('/code-and-messages', async (req, res) => {
             message,
             username,
           })),
+        users: isPcIdDuplicate.users.map(({ fullName, username }) => ({ fullName, username })),
       });
       console.log(`Device [ ${isPcIdDuplicate.code} ] open the client and get messages`);
     } else {
@@ -45,21 +46,9 @@ router.get('/code-and-messages', async (req, res) => {
         users: [],
       });
       const deviceRes = await device.save();
-      res.json({ code });
+      res.json({ code, messages: [], users: [] });
       console.log(`Device [ ${deviceRes.code} ] register successfully!`);
     }
-  } catch (error) {
-    console.error(error);
-    res.sendStatus(500);
-  }
-});
-
-// 获取已绑定的用户姓名
-router.get('/users', async (req, res) => {
-  try {
-    const { users } = await Device.findOne({ code: req.query.code });
-    res.json(users.map(({ fullName, username }) => ({ fullName, username })));
-    console.log(`Device [ ${req.query.code} ] get users successfully!`);
   } catch (error) {
     console.error(error);
     res.sendStatus(500);

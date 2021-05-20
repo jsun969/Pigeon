@@ -46,22 +46,10 @@
 
 <script>
 import { mapState, mapMutations } from 'vuex';
-import axios from 'axios';
 
 export default {
   name: 'Users',
-  async mounted() {
-    try {
-      const { status, data } = (await axios.get('/device/users', { params: { code: this.code } })) || {};
-      if (status === 200) {
-        this.users = data;
-      }
-    } catch (error) {
-      return;
-    }
-  },
   data: () => ({
-    users: [],
     snackbar: false,
     newUser: null,
     newUserAuth: null,
@@ -139,7 +127,7 @@ export default {
     ...mapMutations(['changeMessageFullName']),
   },
   computed: {
-    ...mapState(['code']),
+    ...mapState(['code', 'users']),
   },
 };
 </script>

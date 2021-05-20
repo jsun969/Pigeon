@@ -15,6 +15,7 @@ export default new Vuex.Store({
       message: null,
     },
     messages: [],
+    users: [],
   },
   mutations: {
     popUp(state, payload) {
@@ -30,15 +31,16 @@ export default new Vuex.Store({
     },
   },
   actions: {
-    async getCodeAndMessages() {
+    async getDeviceData() {
       try {
         const {
           status,
-          data: { code,messages },
-        } = (await axios.get('/device/code-and-messages', { params: { pcId: ipcRenderer.sendSync('getPcId') } })) || {};
+          data: { code, messages, users },
+        } = (await axios.get('/device/data', { params: { pcId: ipcRenderer.sendSync('getPcId') } })) || {};
         if (status === 200) {
           this.state.code = code;
           this.state.messages = messages;
+          this.state.users = users;
         }
       } catch {
         this.state.code = '网络错误';
