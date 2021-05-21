@@ -16,6 +16,17 @@ export default new Vuex.Store({
     },
     messages: [],
     users: [],
+    snackbar: {
+      show: false,
+      timer: null,
+      lastTimes: 30,
+    },
+    newUser: {
+      name: null,
+      id: null,
+      remark: null,
+      full: null,
+    },
   },
   mutations: {
     popUp(state, payload) {
@@ -24,10 +35,59 @@ export default new Vuex.Store({
       state.popUp.message = payload.message;
       ipcRenderer.send('createPopUp', { width: payload.width, height: payload.height, id: payload.id });
     },
-    changeMessageFullName(state, payload) {
-      state.messages
-        .filter(({ username }) => username === payload.username)
-        .forEach(message => (message.fullName = payload.newFullName));
+    acceptAddUser(state) {
+      clearTimeout(state.snackbar.timer);
+      state.snackbar.show = false;
+      this._vm.$socket.client.emit('allowAddDevice', {
+        result: true,
+        code: state.code,
+        remarkName: state.newUser.remark,
+        id: state.newUser.id,
+      });
+      state.users.push({ fullName: state.newUser.full, username: state.newUser.name });
+    },
+    refuseAddUser(state) {
+      clearTimeout(state.snackbar.timer);
+      state.snackbar.show = false;
+      this._vm.$socket.client.emit('allowAddDevice', {
+        result: false,
+        code: state.code,
+        remarkName: state.newUser.remark,
+        id: state.newUser.id,
+      });
+    },
+    removeUser(state, payload) {
+      state.users.splice(payload.index, 1);
+    },
+    // Socket IO
+    SOCKET_DEVICEADDREQ(state, { fullName, remarkName, id, username }) {
+      state.newUser.full = fullName;
+      state.newUser.id = id;
+      state.newUser.remark = remarkName;
+      state.newUser.name = username;
+      state.snackbar.show = true;
+      state.snackbar.lastTimes = 30;
+      const countdown = () => {
+        state.snackbar.timer = setTimeout(() => {
+          if (state.snackbar.lastTimes > 0) {
+            state.snackbar.lastTimes--;
+            countdown();
+          } else {
+            clearTimeout(state.snackbar.timer);
+          }
+        }, 1000);
+      };
+      countdown();
+    },
+    SOCKET_REMOVEDEVICEHOTUPDATE(state, { name }) {
+      state.users.splice(
+        state.users.findIndex(({ username }) => username === name),
+        1
+      );
+    },
+    SOCKET_CHANGEFULLNAMEHOTUPDATE(state, { username, newFullName }) {
+      state.messages.filter(({ username }) => username === username).forEach(message => (message.fullName = newFullName));
+      state.users[state.users.findIndex(({ username: usernameTmp }) => username === usernameTmp)].fullName = newFullName;
     },
   },
   actions: {

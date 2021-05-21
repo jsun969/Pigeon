@@ -26,6 +26,20 @@
         <v-tab-item><History /></v-tab-item>
         <v-tab-item><Users /></v-tab-item>
       </v-tabs-items>
+      <v-snackbar v-model="snackbar.show" timeout="30000">
+        <v-progress-circular rotate="-90" :value="(snackbar.lastTimes * 100) / 30" color="white" class="mr-2">
+          {{ snackbar.lastTimes }}
+        </v-progress-circular>
+        {{ newUser.full }}老师请求绑定此设备
+        <template v-slot:action="{ attrs }">
+          <v-btn color="pink" text v-bind="attrs" @click="refuseAddUser">
+            拒绝
+          </v-btn>
+          <v-btn color="pink" text v-bind="attrs" @click="acceptAddUser">
+            同意
+          </v-btn>
+        </template>
+      </v-snackbar>
     </v-main>
   </v-app>
 </template>
@@ -86,9 +100,9 @@ export default {
       shell.openExternal('https://github.com/jsun969/Pigeon');
     },
     ...mapActions(['getDeviceData']),
-    ...mapMutations(['popUp']),
+    ...mapMutations(['popUp', 'acceptAddUser', 'refuseAddUser']),
   },
-  computed: { ...mapState(['code', 'messages']) },
+  computed: { ...mapState(['code', 'messages', 'snackbar', 'newUser']) },
 };
 </script>
 

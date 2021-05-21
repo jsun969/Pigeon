@@ -26,21 +26,6 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
-
-    <v-snackbar v-model="snackbar" timeout="30000">
-      <v-progress-circular rotate="-90" :value="(lastTimes * 100) / 30" color="white" class="mr-2">
-        {{ lastTimes }}
-      </v-progress-circular>
-      {{ newUser }}老师请求绑定此设备
-      <template v-slot:action="{ attrs }">
-        <v-btn color="pink" text v-bind="attrs" @click="refuse">
-          拒绝
-        </v-btn>
-        <v-btn color="pink" text v-bind="attrs" @click="accept">
-          同意
-        </v-btn>
-      </template>
-    </v-snackbar>
   </v-container>
 </template>
 
@@ -50,48 +35,10 @@ import { mapState, mapMutations } from 'vuex';
 export default {
   name: 'Users',
   data: () => ({
-    snackbar: false,
-    newUser: null,
-    newUserAuth: null,
-    newUserName: null,
-    newRemarkName: null,
-    lastTimes: 30,
-    timer: null,
     showDialog: false,
     removingUserName: null,
     removingUserIndex: null,
   }),
-  sockets: {
-    deviceAddReq({ fullName, remarkName, auth, username }) {
-      this.newUser = fullName;
-      this.newUserAuth = auth;
-      this.newRemarkName = remarkName;
-      this.newUserName = username;
-      this.snackbar = true;
-      this.lastTimes = 30;
-      const countdown = () => {
-        this.timer = setTimeout(() => {
-          if (this.lastTimes > 0) {
-            this.lastTimes--;
-            countdown();
-          } else {
-            clearTimeout(this.timer);
-          }
-        }, 1000);
-      };
-      countdown();
-    },
-    removeDeviceHotUpdate({ name }) {
-      this.users.splice(
-        this.users.findIndex(({ username }) => username === name),
-        1
-      );
-    },
-    changeFullNameHotUpdate({ username, newFullName }) {
-      this.changeMessageFullName({ username, newFullName });
-      this.users[this.users.findIndex(({ username: usernameTmp }) => username === usernameTmp)].fullName = newFullName;
-    },
-  },
   methods: {
     confirmRemove(index) {
       this.removingUserIndex = index;
@@ -101,30 +48,9 @@ export default {
     remove(index) {
       this.showDialog = false;
       this.$socket.client.emit('removeUser', { name: this.users[index].username, code: this.code });
-      this.users.splice(index, 1);
+      this.removeUser({ index });
     },
-    accept() {
-      clearTimeout(this.timer);
-      this.snackbar = false;
-      this.$socket.client.emit('allowAddDevice', {
-        result: true,
-        code: this.code,
-        remarkName: this.newRemarkName,
-        userAuth: this.newUserAuth,
-      });
-      this.users.push({ fullName: this.newUser, username: this.newUserName });
-    },
-    refuse() {
-      clearTimeout(this.timer);
-      this.snackbar = false;
-      this.$socket.client.emit('allowAddDevice', {
-        result: false,
-        code: this.code,
-        remarkName: this.newRemarkName,
-        userAuth: this.newUserAuth,
-      });
-    },
-    ...mapMutations(['changeMessageFullName']),
+    ...mapMutations(['changeMessageFullName', 'removeUser']),
   },
   computed: {
     ...mapState(['code', 'users']),

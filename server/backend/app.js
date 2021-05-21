@@ -96,19 +96,18 @@ io.on('connection', socket => {
   socket.on('addDevice', async ({ auth, code, remarkName }) => {
     const { userId } = jwt.verify(auth, cfg.token.secret);
     const { fullName, username } = await User.findById(userId);
-    socket.to(code).emit('deviceAddReq', { fullName, remarkName, auth, username });
+    socket.to(code).emit('deviceAddReq', { fullName, remarkName, id: userId, username });
     console.log(`User [ ${username} ] want to connect Device [ ${code} ]`);
   });
 
   // 新设备是否同意被添加
-  socket.on('allowAddDevice', async ({ result, code, remarkName, userAuth }) => {
-    const { userId } = jwt.verify(userAuth, cfg.token.secret);
-    const { fullName, username } = await User.findById(userId);
+  socket.on('allowAddDevice', async ({ result, code, remarkName, id }) => {
+    const { fullName, username } = await User.findById(id);
     if (result) {
       // 将用户姓名存入设备数据库
       await Device.findOneAndUpdate({ code }, { $push: { users: { fullName, username } } });
       // 将设备代码存入用户数据库
-      await User.findByIdAndUpdate(userId, { $push: { devices: { code, name: remarkName } } });
+      await User.findByIdAndUpdate(id, { $push: { devices: { code, name: remarkName } } });
       console.log(`Add Device [ ${code} ] by User [ ${username} ] successfully!`);
     } else {
       console.log(`Device [ ${code} ] reject User [ ${username} ] add request`);
