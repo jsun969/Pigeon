@@ -155,11 +155,7 @@ io.on('connection', socket => {
   socket.on('sendMessage', async ({ auth, codes, message }, callbackDatabaseData) => {
     const { userId } = jwt.verify(auth, cfg.token.secret);
     const { username, fullName } = await User.findById(userId);
-    const devices = await Promise.all(
-      codes.map(async code => {
-        return { _id: await Device.findOne({ code }), code };
-      })
-    );
+    const devices = await Promise.all(codes.map(async code => ({ _id: await Device.findOne({ code }), code })));
     const messageDatabase = new Message({
       time: Date.now(),
       fullName,
