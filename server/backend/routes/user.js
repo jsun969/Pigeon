@@ -66,36 +66,36 @@ router.post('/login', async (req, res) => {
           .map(({ _id: id, time, devices, message, status }) => ({
             id,
             time,
-            devices,
+            devices: devices.map(({ code }) => code),
             message,
             status,
           })),
-      });
-      console.log(`User [ ${req.body.username} ] login successfully.`);
-    } else {
-      res.status(404).json({ error: 'LoginError' });
-      console.log(`User [ ${req.body.username} ] login error.`);
+        });
+        console.log(`User [ ${req.body.username} ] login successfully.`);
+      } else {
+        res.status(404).json({ error: 'LoginError' });
+        console.log(`User [ ${req.body.username} ] login error.`);
+      }
+    } catch (error) {
+      res.status(500).send({ error });
+      console.error(error);
     }
-  } catch (error) {
-    res.status(500).send({ error });
-    console.error(error);
-  }
-});
-
-// 验证用户的Token
-router.post('/token-verify', async (req, res) => {
-  try {
-    const { userId } = jwt.verify(req.body.auth, cfg.token.secret);
-    const { username, fullName } = await User.findById(userId);
-    const messageDocs = await Message.find();
-    res.json({
-      fullName,
-      messages: messageDocs
+  });
+  
+  // 验证用户的Token
+  router.post('/token-verify', async (req, res) => {
+    try {
+      const { userId } = jwt.verify(req.body.auth, cfg.token.secret);
+      const { username, fullName } = await User.findById(userId);
+      const messageDocs = await Message.find();
+      res.json({
+        fullName,
+        messages: messageDocs
         .filter(({ username: usernameTmp }) => username === usernameTmp)
         .map(({ _id: id, time, devices, message, status }) => ({
           id,
           time,
-          devices,
+          devices: devices.map(({ code }) => code),
           message,
           status,
         })),

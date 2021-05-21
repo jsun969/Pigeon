@@ -4,7 +4,7 @@ const messageSchema = mongoose.Schema({
   time: Date,
   username: String,
   fullName: String,
-  devices: [String],
+  devices: [{ code: String, _id: String }],
   message: String,
   status: Boolean,
 });

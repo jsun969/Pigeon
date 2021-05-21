@@ -53,8 +53,10 @@ io.on('connection', socket => {
     const codeStr = code.toString();
     socket.join(codeStr);
     onlineDevices.push({ code: codeStr, id: socket.id });
-    const { users } = await Device.findOne({ code });
-    socket.to(users.map(({ username }) => username)).emit('deviceOnline', { code });
+    const devicesDocs = await Device.findOne({ code });
+    if (devicesDocs) {
+      socket.to(devicesDocs.users.map(({ username }) => username)).emit('deviceOnline', { code });
+    }
     console.log(`Device [ ${socket.id} ] created with code [ ${code} ]`);
   });
 
@@ -153,11 +155,17 @@ io.on('connection', socket => {
   socket.on('sendMessage', async ({ auth, codes, message }, callbackDatabaseData) => {
     const { userId } = jwt.verify(auth, cfg.token.secret);
     const { username, fullName } = await User.findById(userId);
+    const devices = await Promise.all(
+      codes.map(async code => {
+        const { _id } = await Device.findOne({ code });
+        return { code, _id };
+      })
+    );
     const messageDatabase = new Message({
       time: Date.now(),
       fullName,
       username,
-      devices: codes,
+      devices,
       message,
       status: true,
     });
@@ -169,7 +177,7 @@ io.on('connection', socket => {
 
   // 关闭消息
   socket.on('messageClosed', async ({ id }) => {
-    const { message, time, username } = await Message.findByIdAndUpdate(id, { status: false });
+    const { message, username } = await Message.findByIdAndUpdate(id, { status: false });
     socket.to(username).emit('messageClosedToUser', { id });
     console.log(`Message [ ${message} ] is closed`);
   });

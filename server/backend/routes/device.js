@@ -20,7 +20,9 @@ router.get('/data', async (req, res) => {
       res.json({
         code: isPcIdDuplicate.code,
         messages: messageDocs
-          .filter(({ devices }) => devices.includes(isPcIdDuplicate.code))
+          .filter(({ devices }) =>
+            devices.map(({ id }) => id).includes(crypto.createHash('sha256').update(req.query.pcId).digest('hex'))
+          )
           .map(({ time, fullName, message, username }) => ({
             time,
             fullName,
@@ -46,7 +48,21 @@ router.get('/data', async (req, res) => {
         users: [],
       });
       const deviceRes = await device.save();
-      res.json({ code, messages: [], users: [] });
+      const messageDocs = await Message.find();
+      res.json({
+        code,
+        messages: messageDocs
+          .filter(({ devices }) =>
+            devices.map(({ _id: id }) => id).includes(crypto.createHash('sha256').update(req.query.pcId).digest('hex'))
+          )
+          .map(({ time, fullName, message, username }) => ({
+            time,
+            fullName,
+            message,
+            username,
+          })),
+        users: [],
+      });
       console.log(`Device [ ${deviceRes.code} ] register successfully!`);
     }
   } catch (error) {
