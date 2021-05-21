@@ -157,8 +157,7 @@ io.on('connection', socket => {
     const { username, fullName } = await User.findById(userId);
     const devices = await Promise.all(
       codes.map(async code => {
-        const { _id } = await Device.findOne({ code });
-        return { code, _id };
+        return { _id: await Device.findOne({ code }), code };
       })
     );
     const messageDatabase = new Message({
