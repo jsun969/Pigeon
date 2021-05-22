@@ -21,7 +21,7 @@ async function createWindow() {
     frame: false,
     icon: path.join(__static, 'logo.png'),
     webPreferences: {
-      devtools: isDevelopment,
+      devTools: isDevelopment,
       // Use pluginOptions.nodeIntegration, leave this alone
       // See nklayman.github.io/vue-cli-plugin-electron-builder/guide/security.html#node-integration for more info
       nodeIntegration: process.env.ELECTRON_NODE_INTEGRATION,
@@ -50,7 +50,7 @@ async function createPopUpWindow({ width, height }) {
     alwaysOnTop: true,
     icon: path.join(__static, 'logo.png'),
     webPreferences: {
-      devtools: isDevelopment,
+      devTools: isDevelopment,
       // Use pluginOptions.nodeIntegration, leave this alone
       // See nklayman.github.io/vue-cli-plugin-electron-builder/guide/security.html#node-integration for more info
       nodeIntegration: process.env.ELECTRON_NODE_INTEGRATION,
