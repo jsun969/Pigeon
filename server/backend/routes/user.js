@@ -8,6 +8,7 @@ const router = express.Router();
 
 const User = require('../models/user');
 const Message = require('../models/message');
+const InviteCode = require('./models/inviteCode');
 
 // 注册(屎山)
 router.post('/register', async (req, res) => {
@@ -70,27 +71,27 @@ router.post('/login', async (req, res) => {
             message,
             status,
           })),
-        });
-        console.log(`User [ ${req.body.username} ] login successfully.`);
-      } else {
-        res.status(404).json({ error: 'LoginError' });
-        console.log(`User [ ${req.body.username} ] login error.`);
-      }
-    } catch (error) {
-      res.status(500).send({ error });
-      console.error(error);
+      });
+      console.log(`User [ ${req.body.username} ] login successfully.`);
+    } else {
+      res.status(404).json({ error: 'LoginError' });
+      console.log(`User [ ${req.body.username} ] login error.`);
     }
-  });
-  
-  // 验证用户的Token
-  router.post('/token-verify', async (req, res) => {
-    try {
-      const { userId } = jwt.verify(req.body.auth, cfg.token.secret);
-      const { username, fullName } = await User.findById(userId);
-      const messageDocs = await Message.find();
-      res.json({
-        fullName,
-        messages: messageDocs
+  } catch (error) {
+    res.status(500).send({ error });
+    console.error(error);
+  }
+});
+
+// 验证用户的Token
+router.post('/token-verify', async (req, res) => {
+  try {
+    const { userId } = jwt.verify(req.body.auth, cfg.token.secret);
+    const { username, fullName } = await User.findById(userId);
+    const messageDocs = await Message.find();
+    res.json({
+      fullName,
+      messages: messageDocs
         .filter(({ username: usernameTmp }) => username === usernameTmp)
         .map(({ _id: id, time, devices, message, status }) => ({
           id,
