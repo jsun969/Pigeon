@@ -27,6 +27,7 @@ export default {
   }),
   mounted() {
     this.databaseID = ipcRenderer.sendSync('getDatabaseID');
+    document.title = `来自${this.popUp.from}老师的消息`;
   },
   methods: {
     close() {

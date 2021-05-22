@@ -1,5 +1,12 @@
 {
-  "name": "client",
+  "name": "pigeon",
+  "homepage": "https://github.com/jsun969/Pigeon",
+  "author": {
+    "name": "jsun969",
+    "email": "i@jsun969.cn",
+    "url": "https://jsun969.cn"
+  },
+  "description": "A remote pop-up software",
   "version": "0.1.0",
   "private": true,
   "scripts": {

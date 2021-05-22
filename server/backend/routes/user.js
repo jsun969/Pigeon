@@ -8,7 +8,7 @@ const router = express.Router();
 
 const User = require('../models/user');
 const Message = require('../models/message');
-const InviteCode = require('./models/inviteCode');
+const InviteCode = require('../models/inviteCode');
 
 // 注册(屎山)
 router.post('/register', async (req, res) => {
