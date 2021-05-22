@@ -7,7 +7,7 @@ import { io } from 'socket.io-client';
 
 Vue.config.productionTip = false;
 
-const socket = io('http://127.0.0.1:3000');
+const socket = io(process.env.VUE_APP_BASE_URL);
 
 Vue.use(VueSocketIOExt, socket);
 
