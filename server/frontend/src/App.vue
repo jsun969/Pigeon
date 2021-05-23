@@ -85,25 +85,29 @@ export default {
     Dialog,
   },
   async mounted() {
-    try {
-      const {
-        status,
-        data: { fullName, messages },
-      } = (await axios.post('/user/token-verify', { auth: localStorage.getItem('userToken') })) || {};
-      if (status === 200) {
-        this.userLogin({ value: true });
-        axios.defaults.headers.common['auth'] = localStorage.getItem('userToken');
-        this.setFullName({ fullName });
-        this.setMessages({ messages });
-        this.getAllDevices();
+    if (localStorage.getItem('userToken')) {
+      try {
+        const {
+          status,
+          data: { fullName, messages },
+        } = (await axios.post('/user/token-verify', { auth: localStorage.getItem('userToken') })) || {};
+        if (status === 200) {
+          this.userLogin({ value: true });
+          axios.defaults.headers.common['auth'] = localStorage.getItem('userToken');
+          this.setFullName({ fullName });
+          this.setMessages({ messages });
+          this.getAllDevices();
+        }
+      } catch (error) {
+        return;
       }
-    } catch (error) {
-      return;
     }
   },
   sockets: {
     connect() {
-      this.$socket.client.emit('userCreated', { auth: localStorage.getItem('userToken') });
+      if (localStorage.getItem('userToken')) {
+        this.$socket.client.emit('userCreated', { auth: localStorage.getItem('userToken') });
+      }
     },
   },
   data: () => ({
