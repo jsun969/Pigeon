@@ -27,6 +27,24 @@
 
 ![image.png](https://i.loli.net/2021/05/22/gOWVHAkDIJG3Zl7.png)
 
+# 命令行后台
+
+## 生成邀请码
+
+> gen-icodes <数量>
+
+## 获取邀请码
+
+> icodes <used(已使用) | unused(未使用) | 空(所有)>
+
+## 在线用户
+
+> user
+
+## 在线设备
+
+> device
+
 # 常见问题
 
 1. **如何开机自启动?**  
