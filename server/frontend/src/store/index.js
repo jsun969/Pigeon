@@ -90,7 +90,13 @@ export default new Vuex.Store({
   },
   getters: {
     messagesRev: state =>
-      state.messages.map((item, index, arr) => ({ ...item, isActive: index >= arr.length - 10 ? true : false })).reverse(),
+      state.messages
+        .map((item, index, arr) => ({
+          ...item,
+          devicesRemark: item.devices.map(deviceCode => (state.devices.find(({ code }) => code === deviceCode) || {}).name),
+          isActive: index >= arr.length - 10 ? true : false,
+        }))
+        .reverse(),
   },
   actions: {},
   modules: {},

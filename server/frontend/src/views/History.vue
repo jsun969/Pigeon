@@ -10,7 +10,7 @@
         transition="fade-transition"
       >
         <v-card elevation="4">
-          <v-card-title> 发送至{{ item.devices.toString() }} </v-card-title>
+          <v-card-title> 发送至{{ item.devicesRemark.toString() }} </v-card-title>
           <v-card-text class="d-flex flex-column">
             <span>{{ item.message }}</span>
             <div class="d-flex justify-space-between mt-4">
