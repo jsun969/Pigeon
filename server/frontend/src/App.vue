@@ -1,6 +1,6 @@
 <template>
   <v-app>
-    <v-navigation-drawer v-if="$vuetify.breakpoint.name !== 'xs' && this.isLogin" app clipped :mini-variant="drawer" permanent>
+    <v-navigation-drawer v-if="$vuetify.breakpoint.name !== 'xs' && isLogin" app clipped :mini-variant="drawer" permanent>
       <v-list :shaped="!drawer">
         <v-list-item link v-for="(item, index) in navItems" :key="index" :to="item.to" color="primary">
           <v-list-item-icon>
@@ -22,21 +22,18 @@
       </template>
     </v-navigation-drawer>
     <v-app-bar app color="primary" dark clipped-left>
-      <v-app-bar-nav-icon
-        @click="drawer = !drawer"
-        v-if="$vuetify.breakpoint.name !== 'xs' && this.isLogin"
-      ></v-app-bar-nav-icon>
+      <v-app-bar-nav-icon @click="drawer = !drawer" v-if="$vuetify.breakpoint.name !== 'xs' && isLogin"></v-app-bar-nav-icon>
       <v-toolbar-title>飞鸽传书</v-toolbar-title>
       <v-btn icon @click="github" class="ml-5">
         <v-icon>mdi-github</v-icon>
       </v-btn>
       <v-spacer></v-spacer>
-      <span v-if="this.isLogin">欢迎您 , {{ this.userFullName }}老师</span>
+      <span v-if="isLogin">欢迎您 , {{ userFullName }}老师</span>
       <v-btn
         icon
         @click="showDialog({ value: 'Logout', style: 2, text: '确定退出当前帐号?' })"
         class="ml-5"
-        v-if="$vuetify.breakpoint.name === 'xs' && this.isLogin"
+        v-if="$vuetify.breakpoint.name === 'xs' && isLogin"
       >
         <v-icon>mdi-logout</v-icon>
       </v-btn>
@@ -51,8 +48,8 @@
         </v-tabs>
       </template>
     </v-app-bar>
-    <UserAuth v-if="!this.isLogin" />
-    <v-main v-else>
+    <UserAuth v-if="isLogin !== null && !isLogin" />
+    <v-main v-if="isLogin !== null && isLogin">
       <router-view />
       <v-bottom-navigation fixed v-model="btmNav" color="primary" grow v-if="$vuetify.breakpoint.name === 'xs'">
         <v-btn v-for="(item, i) in navItems" :key="i" :to="item.to" :value="item.value">
@@ -62,9 +59,9 @@
       </v-bottom-navigation>
     </v-main>
     <Dialog
-      :showDialog="this.dialog.open"
-      :mainText="this.dialog.text"
-      :titleStyle="this.dialog.style"
+      :showDialog="dialog.open"
+      :mainText="dialog.text"
+      :titleStyle="dialog.style"
       @close="closeDialog"
       @confirmClose="confirmCloseDialog"
       @refuseClose="refuseCloseDialog"
@@ -99,8 +96,11 @@ export default {
           this.getAllDevices();
         }
       } catch (error) {
+        this.userLogin({ value: false });
         return;
       }
+    } else {
+      this.userLogin({ value: false });
     }
   },
   sockets: {

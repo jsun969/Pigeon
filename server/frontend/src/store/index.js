@@ -5,7 +5,7 @@ Vue.use(Vuex);
 
 export default new Vuex.Store({
   state: {
-    isLogin: false,
+    isLogin: null,
     dialog: { value: '', open: false, text: '', style: 0 },
     userFullName: null,
     // 确定弹窗后修改前端新姓名的一个临时的全局变量 还没找到别的方法
