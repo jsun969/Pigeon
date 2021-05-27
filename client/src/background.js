@@ -3,7 +3,6 @@
 import { app, protocol, BrowserWindow, ipcMain, Menu, Tray } from 'electron';
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib';
 import installExtension, { VUEJS_DEVTOOLS } from 'electron-devtools-installer';
-import { machineId } from 'node-machine-id';
 import path from 'path';
 
 const isDevelopment = process.env.NODE_ENV !== 'production';
@@ -142,11 +141,6 @@ if (!gotTheLock) {
     });
 
     createWindow();
-
-    // 发送设备代码
-    ipcMain.on('getPcId', async event => {
-      event.returnValue = await machineId();
-    });
 
     // 打开弹窗
     let databaseId;

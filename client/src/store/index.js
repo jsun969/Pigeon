@@ -3,6 +3,7 @@ import Vuex from 'vuex';
 import axios from 'axios';
 import createPersistedState from 'vuex-persistedstate';
 import { ipcRenderer } from 'electron';
+import crypto from 'crypto';
 
 Vue.use(Vuex);
 
@@ -93,10 +94,15 @@ export default new Vuex.Store({
   actions: {
     async getDeviceData() {
       try {
+        let pcId = localStorage.getItem('pcId');
+        if (!pcId) {
+          pcId = crypto.randomBytes(30).toString('hex');
+          localStorage.setItem('pcId', pcId);
+        }
         const {
           status,
           data: { code, messages, users },
-        } = (await axios.get('/device/data', { params: { pcId: ipcRenderer.sendSync('getPcId') } })) || {};
+        } = (await axios.get('/device/data', { params: { pcId } })) || {};
         if (status === 200) {
           this.state.code = code;
           this.state.messages = messages;
