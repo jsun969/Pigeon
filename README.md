@@ -1,7 +1,8 @@
 ## Todo List
 - [ ] 多设备消息状态反馈错误  
 - [ ] 用户自定义消息显示位置  
-- [ ] 撤回消息
+- [ ] 撤回消息  
+- [ ] 语音消息  
 
 ![Pigeon](https://socialify.git.ci/jsun969/Pigeon/image?description=1&font=Source%20Code%20Pro&forks=1&issues=1&language=1&logo=https%3A%2F%2Fi.loli.net%2F2021%2F05%2F22%2FWbwqHet19hd24Fz.png&owner=1&pattern=Brick%20Wall&pulls=1&stargazers=1&theme=Light)
 
