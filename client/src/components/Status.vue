@@ -38,7 +38,7 @@
               </div>
             </v-list-item-content>
             <v-list-item-avatar tile size="80">
-              <img src="../assets/avatar.svg" alt="avatar" />
+              <img src="../assets/avatar.png" alt="avatar" />
             </v-list-item-avatar>
           </v-list-item>
         </v-card>
