@@ -1,7 +1,7 @@
 module.exports = {
   app: {
     port: 3000,
-    origins: ["*"],
+    origins: ['*'],
   },
   db: {
     username: '',
@@ -13,5 +13,8 @@ module.exports = {
   token: {
     secret: '114514',
     maxAge: 60 * 60 * 24 * 7,
+  },
+  admin: {
+    key: 'lol',
   },
 };
