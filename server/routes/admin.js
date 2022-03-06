@@ -55,11 +55,16 @@ router.post('/invite-codes', auth, async (req, res) => {
 });
 
 router.get('/invite-codes', auth, async (req, res) => {
+  const where = req.query.used && {
+    username: req.query.used === 'true' ? { $ne: null } : null,
+  };
   const data = await InviteCode.find()
     .sort({ createdAt: -1 })
+    .where(where)
+    .select(['_id', 'username', 'updatedAt'])
     .limit(+req.query.take)
     .skip(+req.query.skip);
-  const total = await InviteCode.count();
+  const total = await InviteCode.where(where).count();
   return res.json({ data, total });
 });
 
