@@ -25,15 +25,15 @@
 
 ## 绑定设备
 
-![image.png](https://i.loli.net/2021/05/22/89PcA2m4nqyXvjU.png)
+![image.png](/images/connect-devices.png)
 
 ## 发送消息
 
-![image.png](https://i.loli.net/2021/05/22/vSruBxD95WaPj63.png)
+![image.png](/images/send-message.png)
 
 ## 历史记录
 
-![image.png](https://i.loli.net/2021/05/22/gOWVHAkDIJG3Zl7.png)
+![image.png](/images/history.png)
 
 # 命令行后台
 
