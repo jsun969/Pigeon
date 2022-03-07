@@ -7,6 +7,7 @@ const crypto = require('crypto');
 const router = express.Router();
 
 const InviteCode = require('../models/inviteCode');
+const Message = require('../models/message');
 
 const auth = (req, res, next) => {
   let jwtResult;
@@ -58,13 +59,29 @@ router.get('/invite-codes', auth, async (req, res) => {
   const where = req.query.used && {
     username: req.query.used === 'true' ? { $ne: null } : null,
   };
-  const data = await InviteCode.find()
+  const data = await InviteCode.find(where)
     .sort({ createdAt: -1 })
-    .where(where)
     .select(['_id', 'username', 'updatedAt'])
     .limit(+req.query.take)
     .skip(+req.query.skip);
-  const total = await InviteCode.where(where).count();
+  const total = await InviteCode.countDocuments(where);
+  return res.json({ data, total });
+});
+
+router.get('/messages', auth, async (req, res) => {
+  const where = {};
+  if (req.query.username) {
+    where.username = req.query.username;
+  }
+  if (req.query.code) {
+    where['devices.code'] = req.query.code;
+  }
+  console.log(where);
+  const data = await Message.find(where)
+    .sort({ time: -1 })
+    .limit(+req.query.take)
+    .skip(+req.query.skip);
+  const total = await Message.countDocuments(where);
   return res.json({ data, total });
 });
 
