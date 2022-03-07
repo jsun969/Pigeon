@@ -76,7 +76,6 @@ router.get('/messages', auth, async (req, res) => {
   if (req.query.code) {
     where['devices.code'] = req.query.code;
   }
-  console.log(where);
   const data = await Message.find(where)
     .sort({ time: -1 })
     .limit(+req.query.take)
